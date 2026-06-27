@@ -1,0 +1,238 @@
+.card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #f1f5f9;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  position: relative;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+.card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  transform: translateY(-3px);
+  border-color: #e2e8f0;
+}
+
+.outOfStockCard {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.imageContainer {
+  height: 140px;
+  background-color: #ffffff;
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+
+.image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.imagePlaceholder {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.outOfStockOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+
+.outOfStockText {
+  color: #ffffff;
+  background-color: var(--danger);
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.vegIcon {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  width: 15px;
+  height: 15px;
+  border: 1px solid #16a34a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  border-radius: 3px;
+  z-index: 4;
+}
+
+.vegDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #16a34a;
+}
+
+.addButtonWrapper {
+  position: absolute;
+  bottom: -12px;
+  right: 10px;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.addBtn {
+  background-color: #ffffff;
+  color: #15803d; /* Brand Green */
+  border: 1.5px solid #22c55e; /* Vibrant Green border matching mockup */
+  border-radius: 8px;
+  padding: 6px 20px;
+  font-size: 0.8rem;
+  font-weight: 850;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 72px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.addBtn:hover {
+  background-color: #f0fdf4;
+  border-color: #15803d;
+}
+
+.quantityControl {
+  background-color: #15803d; /* Brand Green matching mockup controller */
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  border: 1.5px solid #15803d;
+  overflow: hidden;
+  min-width: 72px;
+}
+
+.qtyBtn {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 800;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.qtyBtn:hover {
+  background-color: #166534;
+}
+
+.qtyText {
+  font-size: 0.85rem;
+  font-weight: 800;
+  padding: 0 2px;
+  min-width: 14px;
+  text-align: center;
+}
+
+.infoContainer {
+  padding: 14px 12px 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-grow: 1;
+}
+
+.unitTag {
+  background-color: transparent; /* No background grey box matching mockup */
+  align-self: flex-start;
+  padding: 0;
+  margin-bottom: 2px;
+}
+
+.unitText {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b; /* Medium grey */
+}
+
+.name {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.25rem;
+  height: 2.5rem; /* Exactly 2 lines */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  margin: 2px 0;
+}
+
+.deliveryRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.clockIcon {
+  width: 14px;
+  height: 14px;
+  color: #16a34a;
+}
+
+.deliveryText {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+.discountText {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #2563eb;
+}
+
+.priceRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.price {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #000000; /* Rich black text for price */
+}
+
+.originalPrice {
+  font-size: 0.8rem;
+  text-decoration: line-through;
+  color: #94a3b8;
+  margin-left: 2px;
+}

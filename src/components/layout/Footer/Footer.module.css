@@ -1,0 +1,319 @@
+.footer {
+  background-color: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  width: 100%;
+  margin-top: auto;
+  font-family: inherit;
+}
+
+/* ─── USP SECTION ─── */
+.uspSection {
+  padding: 36px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.uspContainer {
+  max-width: 1400px;
+  width: 95%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.uspItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1 1 300px;
+}
+
+.uspIconWrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background-color: #f0fdf4;
+  color: #16a34a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.uspIcon {
+  width: 22px;
+  height: 22px;
+}
+
+.uspTextContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.uspTitle {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.uspDescription {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.25;
+}
+
+/* ─── MAIN FOOTER SECTION ─── */
+.mainFooter {
+  padding: 48px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.footerContainer {
+  max-width: 1400px;
+  width: 95%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+.brandCol {
+  flex: 2 1 350px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.brandHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footerLogoImg {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  border-radius: 50%;
+  background-color: #ffffff;
+  padding: 1px;
+}
+
+.brandName {
+  font-size: 1.6rem;
+  font-weight: 850;
+  color: #15803d; /* Brand Green */
+  letter-spacing: -0.5px;
+}
+
+.brandDesc {
+  font-size: 0.9rem;
+  color: #64748b;
+  line-height: 1.5rem;
+  margin: 0;
+  max-width: 420px;
+}
+
+.safeBadge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  padding: 6px 14px;
+  border-radius: 20px;
+  align-self: flex-start;
+}
+
+.shieldIcon {
+  width: 14px;
+  height: 14px;
+  color: #16a34a;
+}
+
+.safeBadgeText {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #16a34a;
+}
+
+.linksCol {
+  flex: 1 1 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.colTitle {
+  font-size: 0.95rem;
+  font-weight: 850;
+  color: #0f172a;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.linksList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.linksList a {
+  font-size: 0.9rem;
+  color: #64748b;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.linksList a:hover {
+  color: #15803d;
+}
+
+.categoriesCol {
+  flex: 2 1 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.categoriesHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.seeAllCategories {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #16a34a;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.seeAllCategories:hover {
+  opacity: 0.8;
+}
+
+.categoriesSubGrid {
+  display: flex;
+  gap: 24px;
+}
+
+.subGridCol {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.categoriesSubGrid a {
+  font-size: 0.9rem;
+  color: #64748b;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.categoriesSubGrid a:hover {
+  color: #15803d;
+}
+
+/* ─── BOTTOM COPYRIGHT BAR ─── */
+.bottomBar {
+  padding: 24px 0;
+  background-color: #f1f5f9;
+}
+
+.bottomContainer {
+  max-width: 1400px;
+  width: 95%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.copyrightText {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.bottomRightActions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.socialsGroup {
+  display: flex;
+  gap: 10px;
+}
+
+.socialLink {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  transition: all 0.2s ease;
+}
+
+.socialLink:hover {
+  border-color: #15803d;
+  color: #15803d;
+  background-color: #f0fdf4;
+}
+
+.socialIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.scrollTopBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #0f172a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.scrollTopBtn:hover {
+  border-color: #15803d;
+  color: #15803d;
+  background-color: #f0fdf4;
+}
+
+.scrollArrow {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 767px) {
+  .footer {
+    display: none !important;
+  }
+}

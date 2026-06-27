@@ -1,0 +1,640 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useGlobalState } from '../../context/GlobalStateContext';
+import { ROUTES } from '../../utils/constants';
+import { categoryService } from '../../services/categoryService';
+import { bannerService } from '../../services/bannerService';
+import { productService } from '../../services/productService';
+import { shopService } from '../../services/shopService';
+import ProductCard from '../../components/common/ProductCard/ProductCard';
+import Loader from '../../components/common/Loader/Loader';
+import logoImg from '../../assets/logo.png';
+import bannerBagImg from '../../assets/grocery_banner_bag.png';
+import categoryPlaceholder from '../../assets/category_placeholder.png';
+import styles from './Home.module.css';
+const fallbackCategories = [
+  { id: '1', name: 'Grocery' },
+  { id: '2', name: 'Vegetables' },
+  { id: '3', name: 'Fruits' },
+  { id: '4', name: 'Snacks' },
+  { id: '5', name: 'Dairy Products' },
+  { id: '6', name: 'Cold Drinks' },
+];
+
+const fallbackProducts = [
+  {
+    id: 'g1',
+    name: 'Aashirvaad Atta (1 kg)',
+    price: 1440,
+    discountPrice: 1440,
+    unit: '1.00 kg',
+    categoryId: '1',
+    categoryName: 'Grocery',
+    type: 'trending',
+    isAvailable: true,
+    stock: 10
+  },
+  {
+    id: 'g2',
+    name: 'Aashirvaad Atta (5 kg)',
+    price: 1410,
+    discountPrice: 1410,
+    unit: '5.00 kg',
+    categoryId: '1',
+    categoryName: 'Grocery',
+    type: 'best deal',
+    isAvailable: true,
+    stock: 10
+  },
+  {
+    id: 'g3',
+    name: 'Chana Dal',
+    price: 2220,
+    discountPrice: 2220,
+    unit: '1.00 pack',
+    categoryId: '1',
+    categoryName: 'Grocery',
+    type: 'trending',
+    isAvailable: true,
+    stock: 10
+  },
+  {
+    id: 'g4',
+    name: 'Colgate (12 pcs + 1)',
+    price: 216,
+    discountPrice: 216,
+    unit: '13.00 piece',
+    categoryId: '1',
+    categoryName: 'Grocery',
+    type: 'best deal',
+    isAvailable: true,
+    stock: 10
+  },
+  {
+    id: 'g5',
+    name: 'Colgate (12 pcs)',
+    price: 108,
+    discountPrice: 108,
+    unit: '12.00 piece',
+    categoryId: '1',
+    categoryName: 'Grocery',
+    type: 'trending',
+    isAvailable: true,
+    stock: 10
+  },
+  {
+    id: 'g6',
+    name: 'Dettol Soap (40 pcs)',
+    price: 860,
+    discountPrice: 860,
+    unit: '41.00 piece',
+    categoryId: '1',
+    categoryName: 'Grocery',
+    type: 'best deal',
+    isAvailable: true,
+    stock: 10
+  },
+  {
+    id: 'v1',
+    name: 'Fresh Lady Finger (Bhindi)',
+    price: 40,
+    discountPrice: 35,
+    unit: '1.00 kg',
+    categoryId: '2',
+    categoryName: 'Vegetables',
+    type: 'best deal',
+    isAvailable: true,
+    stock: 20
+  },
+  {
+    id: 'v2',
+    name: 'Fresh Bitter Gourd (Karela)',
+    price: 50,
+    discountPrice: 45,
+    unit: '500.00 g',
+    categoryId: '2',
+    categoryName: 'Vegetables',
+    type: 'trending',
+    isAvailable: true,
+    stock: 20
+  }
+];
+
+const Home = () => {
+  const navigate = useNavigate();
+  const { cart, addToCart, removeFromCart, user, logout } = useGlobalState();
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [banners, setBanners] = useState([]);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [products, setProducts] = useState([]);
+  const [nearestShop, setNearestShop] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  // Fallback coords for Shastri Nagar, Ujjain
+  const DEFAULT_LAT = 23.176;
+  const DEFAULT_LON = 75.788;
+
+  useEffect(() => {
+    const fetchHomeData = async () => {
+      setLoading(true);
+      
+      // 1. Fetch nearest shop
+      try {
+        const shop = await shopService.getNearestShop(DEFAULT_LAT, DEFAULT_LON);
+        setNearestShop(shop);
+      } catch (e) {
+        console.error('Failed to get shop details', e);
+      }
+
+      // 2. Fetch categories
+      try {
+        const fetchedCategories = await categoryService.getCategories();
+        if (fetchedCategories && fetchedCategories.length > 0) {
+          setCategories(fetchedCategories);
+        } else {
+          setCategories(fallbackCategories);
+        }
+      } catch (e) {
+        console.error('Failed to fetch categories, using fallbacks', e);
+        setCategories(fallbackCategories);
+      }
+
+      // 3. Fetch banners
+      try {
+        const fetchedBanners = await bannerService.getBanners();
+        setBanners(fetchedBanners);
+      } catch (e) {
+        console.error('Failed to fetch banners', e);
+      }
+
+      // 4. Fetch products
+      try {
+        const fetchedProducts = await productService.getProducts();
+        if (fetchedProducts && fetchedProducts.length > 0) {
+          setProducts(fetchedProducts);
+        } else {
+          setProducts(fallbackProducts);
+        }
+      } catch (e) {
+        console.error('Failed to fetch products, using fallbacks', e);
+        setProducts(fallbackProducts);
+      }
+
+      setLoading(false);
+    };
+
+    fetchHomeData();
+  }, []);
+
+  const getCartQuantity = (productId) => {
+    const item = cart.find((item) => String(item.id) === String(productId));
+    return item ? item.quantity : 0;
+  };
+
+  const handleIncrement = (product) => {
+    addToCart(product);
+  };
+
+  const handleDecrement = (product) => {
+    const qty = getCartQuantity(product.id);
+    if (qty > 1) {
+      addToCart({ ...product, quantity: -1 });
+    } else {
+      removeFromCart(product.id);
+    }
+  };
+
+  const trendingProducts = products.filter(p => p.type === 'trending');
+  const bestDeals = products.filter(p => p.type === 'best deal');
+
+  const defaultBanners = [
+    {
+      id: 'default_b1',
+      title: 'Free Delivery on Orders Above 300',
+      subtitle: 'SAVE MORE ON GROCERY',
+      description: 'Shop daily essential with free delivery on orders above 300.',
+      image: bannerBagImg,
+      backgroundColor: 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)',
+      textColor: '#15803d'
+    }
+  ];
+
+  // 1. Dynamic Banners Mapping (Reference from App)
+  const homeTopBanners = banners.filter(
+    (b) => b.location === 'home_top' || b.location === 'hometop'
+  );
+  const homeMiddleBanners = banners.filter(
+    (b) => b.location === 'home_middle' || b.location === 'homemiddle'
+  );
+
+  const displayTopBanners = homeTopBanners.length > 0 ? homeTopBanners : defaultBanners;
+  const displayMiddleBanners = homeMiddleBanners.length > 0 ? homeMiddleBanners : defaultBanners;
+
+  const handlePrevSlide = () => {
+    setCurrentSlide((prev) => (prev === 0 ? displayTopBanners.length - 1 : prev - 1));
+  };
+
+  const handleNextSlide = () => {
+    setCurrentSlide((prev) => (prev === displayTopBanners.length - 1 ? 0 : prev + 1));
+  };
+
+  const activeBanner = displayTopBanners[currentSlide] || displayTopBanners[0];
+  const midBanner = displayMiddleBanners[0] || activeBanner;
+
+  // 2. Dynamic Categories Mapping (Reference from App)
+  const categoriesWithProducts = categories
+    .map((cat) => {
+      const catProducts = products.filter((p) => String(p.categoryId) === String(cat.id));
+      return { ...cat, products: catProducts };
+    })
+    .filter((cat) => cat.products.length > 0)
+    .slice(0, 5);
+
+  const displayedCategories = categories.slice(0, 8);
+  const cartTotalQuantity = cart.reduce((acc, c) => acc + c.quantity, 0);
+
+  const formatETA = (mins) => {
+    if (!mins) return '14 MINS';
+    return `${mins} MINS`;
+  };
+
+  if (loading) {
+    return (
+      <div className={styles.loaderWrapper}>
+        <Loader text="Loading fresh groceries..." />
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.appContainer}>
+      
+      {/* ─── DESKTOP HEADER (EXACT MOCKUP DESIGN) ─── */}
+      <header className={styles.greenHeader}>
+        <div className={styles.headerContainer}>
+          {/* Logo Section */}
+          <div className={styles.logoSection}>
+            <img src={logoImg} alt="Vegpik Logo" className={styles.appLogo} />
+            <span className={styles.logoText}>Vegpik</span>
+          </div>
+
+          {/* Delivery ETA Pill */}
+          <div className={styles.deliveryPill}>
+            <div className={styles.pillLabelContainer}>
+              <span className={styles.deliverInLabel}>DELIVER IN</span>
+              <span className={styles.deliveryTime}>
+                {nearestShop && nearestShop.serviceAvailable 
+                  ? formatETA(nearestShop.deliveryETA || 14) 
+                  : '14 MINS'}
+              </span>
+            </div>
+            <div className={styles.pillAddressContainer}>
+              <span className={styles.addressText}>
+                {nearestShop && nearestShop.address
+                  ? `Home - ${nearestShop.address}` 
+                  : 'Home - 11, Rami nagar...'}
+              </span>
+              <svg className={styles.chevronIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Search Bar */}
+          <div className={styles.searchBarWrapper}>
+            <div className={styles.searchBar}>
+              <svg className={styles.searchIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input 
+                type="text" 
+                placeholder='Search "coke"' 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={styles.searchInput}
+              />
+              <button className={styles.micBtn} aria-label="Voice Search">
+                <svg className={styles.micIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
+                  <path d="M19 10v1a7 7 0 0 1-14 0v-1M12 19v4M8 23h8" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Action buttons */}
+          <div className={styles.headerActions}>
+            <button className={styles.bellBtn} aria-label="Notifications">
+              <svg className={styles.iconBell} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+            </button>
+            
+            {user ? (
+              <div className={styles.profileContainer}>
+                <button 
+                  className={styles.profileAvatarBtn} 
+                  onClick={() => setShowProfileMenu(!showProfileMenu)}
+                  aria-label="Profile menu"
+                >
+                  {user.profile_picture_url ? (
+                    <img src={user.profile_picture_url} alt="Profile" className={styles.avatarImg} />
+                  ) : (
+                    <div className={styles.avatarPlaceholder}>
+                      {user.first_name ? user.first_name[0].toUpperCase() : 'U'}
+                    </div>
+                  )}
+                </button>
+                {showProfileMenu && (
+                  <div className={styles.profileDropdown}>
+                    <div className={styles.dropdownHeader}>
+                      <span className={styles.dropdownName}>{user.first_name} {user.last_name || ''}</span>
+                      <span className={styles.dropdownEmail}>{user.email}</span>
+                    </div>
+                    <button className={styles.dropdownItemLink} onClick={() => { navigate(ROUTES.PROFILE); setShowProfileMenu(false); }}>
+                      My Profile
+                    </button>
+                    <button className={styles.dropdownItem} onClick={() => { logout(); setShowProfileMenu(false); }}>
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button className={styles.loginBtn} onClick={() => navigate(ROUTES.LOGIN)}>Login</button>
+            )}
+            
+            <button className={styles.cartBtn} onClick={() => navigate(ROUTES.CART)}>
+              <div className={styles.cartBtnContent}>
+                <svg className={styles.cartIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                </svg>
+                <span>Cart</span>
+              </div>
+              {cartTotalQuantity > 0 && (
+                <span className={styles.cartBadgeHeader}>{cartTotalQuantity}</span>
+              )}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div className={styles.mainContent}>
+        
+        {/* ─── HERO CAROUSEL BANNER (EXACT GREEN DESIGN) ─── */}
+        <section className={styles.bannerSection}>
+          <div 
+            className={styles.promoBanner}
+            style={{ 
+              background: activeBanner.backgroundColor || 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)',
+              color: activeBanner.textColor || 'inherit'
+            }}
+          >
+            {/* Left Nav Arrow */}
+            <button className={styles.navArrow} aria-label="Previous Slide" onClick={handlePrevSlide}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+
+            <div className={styles.bannerLeft}>
+              {activeBanner.subtitle && <span className={styles.promoBadge}>{activeBanner.subtitle}</span>}
+              <h1 className={styles.bannerHeading}>{activeBanner.title}</h1>
+              {activeBanner.description && (
+                <p className={styles.bannerDescription}>{activeBanner.description}</p>
+              )}
+              <button className={styles.bannerBtn}>Shop Now</button>
+            </div>
+            
+            <div className={styles.bannerRight}>
+              <img 
+                src={activeBanner.image || bannerBagImg} 
+                alt={activeBanner.title} 
+                className={styles.groceryBagImage} 
+              />
+            </div>
+
+            {/* Right Nav Arrow */}
+            <button 
+              className={`${styles.navArrow} ${styles.navArrowRight}`} 
+              aria-label="Next Slide" 
+              onClick={handleNextSlide}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
+          </div>
+          
+          <div className={styles.carouselIndicators}>
+            {displayTopBanners.map((_, idx) => (
+              <span 
+                key={idx} 
+                className={`${styles.dot} ${currentSlide === idx ? styles.activeDot : ''}`}
+                onClick={() => setCurrentSlide(idx)}
+              />
+            ))}
+          </div>
+        </section>
+
+        {/* ─── TRENDING PRODUCTS ROW ─── */}
+        {trendingProducts.length > 0 && (
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h2 className={styles.sectionTitle}>Trending Products</h2>
+              <button className={styles.seeAllBtn}>
+                See All <span className={styles.arrowIcon}>&rarr;</span>
+              </button>
+            </div>
+            <div className={styles.horizontalScroll}>
+              {trendingProducts.map((prod) => (
+                <div key={prod.id} className={styles.horizontalCardWrapper}>
+                  <ProductCard
+                    product={prod}
+                    cartQuantity={getCartQuantity(prod.id)}
+                    onIncrement={() => handleIncrement(prod)}
+                    onDecrement={() => handleDecrement(prod)}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ─── SHOP BY CATEGORY ─── */}
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>Shop by Category</h2>
+            <button className={styles.seeAllBtn} onClick={() => navigate(ROUTES.CATEGORIES)}>
+              See All <span className={styles.arrowIcon}>&rarr;</span>
+            </button>
+          </div>
+          <div className={styles.categoriesGrid}>
+            {displayedCategories.map((cat) => (
+              <div 
+                key={cat.id} 
+                className={styles.categoryCard}
+                onClick={() => navigate(`${ROUTES.CATEGORIES}?cat=${cat.id}`)}
+              >
+                <div className={styles.categoryImageContainer}>
+                  <img src={cat.image || categoryPlaceholder} alt={cat.name} className={styles.categoryImage} />
+                </div>
+                <div className={styles.categoryNameContainer}>
+                  <span className={styles.categoryName}>{cat.name}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ─── DYNAMIC CATEGORY PRODUCT ROWS ─── */}
+        {categoriesWithProducts.map((cat, idx) => (
+          <React.Fragment key={cat.id}>
+            <section className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>{cat.name}</h2>
+                <button className={styles.seeAllBtn}>
+                  See All <span className={styles.arrowIcon}>&rarr;</span>
+                </button>
+              </div>
+              <div className={styles.horizontalScroll}>
+                {cat.products.map((prod) => (
+                  <div key={prod.id} className={styles.horizontalCardWrapper}>
+                    <ProductCard
+                      product={prod}
+                      cartQuantity={getCartQuantity(prod.id)}
+                      onIncrement={() => handleIncrement(prod)}
+                      onDecrement={() => handleDecrement(prod)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Mid-page promotional banner: render after 2 category rows (idx === 1) */}
+            {idx === 1 && (
+              <section className={styles.bannerSection}>
+                <div 
+                  className={styles.promoBanner}
+                  style={{ 
+                    background: midBanner.backgroundColor || 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)',
+                    color: midBanner.textColor || 'inherit'
+                  }}
+                >
+                  {/* Left Nav Arrow */}
+                  <button className={styles.navArrow} aria-label="Previous Slide">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                      <polyline points="15 18 9 12 15 6" />
+                    </svg>
+                  </button>
+
+                  <div className={styles.bannerLeft}>
+                    {midBanner.subtitle && <span className={styles.promoBadge}>{midBanner.subtitle}</span>}
+                    <h1 className={styles.bannerHeading}>{midBanner.title}</h1>
+                    {midBanner.description && (
+                      <p className={styles.bannerDescription}>{midBanner.description}</p>
+                    )}
+                    <button className={styles.bannerBtn}>Shop Now</button>
+                  </div>
+                  
+                  <div className={styles.bannerRight}>
+                    <img 
+                      src={midBanner.image || bannerBagImg} 
+                      alt={midBanner.title} 
+                      className={styles.groceryBagImage} 
+                    />
+                  </div>
+
+                  {/* Right Nav Arrow */}
+                  <button className={`${styles.navArrow} ${styles.navArrowRight}`} aria-label="Next Slide">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  </button>
+                </div>
+                
+                <div className={styles.carouselIndicators}>
+                  {displayMiddleBanners.map((_, dotIdx) => (
+                    <span 
+                      key={dotIdx} 
+                      className={`${styles.dot} ${displayMiddleBanners.length > 1 ? (dotIdx === 1 ? styles.activeDot : '') : (dotIdx === 0 ? styles.activeDot : '')}`}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
+          </React.Fragment>
+        ))}
+
+        {/* ─── TRENDING PRODUCTS ROW ─── */}
+
+        {/* ─── BEST DEALS ROW ─── */}
+        {bestDeals.length > 0 && (
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h2 className={styles.sectionTitle}>Best Deals</h2>
+              <button className={styles.seeAllBtn}>
+                See All <span className={styles.arrowIcon}>&rarr;</span>
+              </button>
+            </div>
+            <div className={styles.horizontalScroll}>
+              {bestDeals.map((prod) => (
+                <div key={prod.id} className={styles.horizontalCardWrapper}>
+                  <ProductCard
+                    product={prod}
+                    cartQuantity={getCartQuantity(prod.id)}
+                    onIncrement={() => handleIncrement(prod)}
+                    onDecrement={() => handleDecrement(prod)}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+
+      {/* ─── MOBILE BOTTOM TABS ─── */}
+      <div className={styles.bottomTabs}>
+        <button className={`${styles.tabItem} ${styles.tabItemActive}`}>
+          <svg className={styles.tabIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+          <span className={styles.tabLabel}>Home</span>
+        </button>
+        <button className={styles.tabItem} onClick={() => navigate(ROUTES.CATEGORIES)}>
+          <svg className={styles.tabIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
+          </svg>
+          <span className={styles.tabLabel}>Categories</span>
+        </button>
+        <button className={styles.tabItem} onClick={() => navigate(ROUTES.CART)}>
+          <div className={styles.cartIconWrapper}>
+            <svg className={styles.tabIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+            </svg>
+            {cartTotalQuantity > 0 && (
+              <span className={styles.cartBadge}>{cartTotalQuantity}</span>
+            )}
+          </div>
+          <span className={styles.tabLabel}>Cart</span>
+        </button>
+        <button className={styles.tabItem}>
+          <svg className={styles.tabIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+          </svg>
+          <span className={styles.tabLabel}>Order Again</span>
+        </button>
+      </div>
+
+    </div>
+  );
+};
+
+export default Home;

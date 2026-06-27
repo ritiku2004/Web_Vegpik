@@ -1,0 +1,70 @@
+/* Design System Variables */
+:root {
+  /* Colors */
+  --primary-color: #15803D;      /* Darker Rich Green (theme.colors.primary) */
+  --primary-hover: #166534;      /* Darker Forest Green (theme.colors.secondary) */
+  --primary-light: #DCFCE7;      /* Light green tint (theme.colors.primaryLight) */
+  --secondary-color: #16a34a;    /* Green accent */
+  --secondary-hover: #15803d;
+  --accent-color: #f59e0b;       /* Amber for offers */
+  
+  /* Neutral Palette */
+  --bg-color: #f8fafc;           /* Light grey-blue background */
+  --surface-color: #ffffff;      /* Card/container backgrounds */
+  --border-color: #e2e8f0;
+  --text-primary: #111827;       /* Dark text (theme.colors.textPrimary) */
+  --text-secondary: #6b7280;     /* Slate gray text (theme.colors.textSecondary) */
+  --text-muted: #94a3b8;
+  
+  /* Status Colors */
+  --success: #15803D;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --info: #3B82F6;
+
+  /* Typography */
+  --font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 20px;
+  --spacing-xxl: 24px;
+  
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+  --shadow-premium: 0 20px 25px -5px rgba(21, 128, 61, 0.07), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+
+  /* Transitions */
+  --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Layout */
+  --max-width: 1200px;
+  --header-height: 70px;
+}
+
+/* Dark mode overrides */
+[data-theme="dark"] {
+  --bg-color: #0f172a;
+  --surface-color: #1e293b;
+  --border-color: #334155;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #64748b;
+  --primary-light: #064e3b;
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+}
