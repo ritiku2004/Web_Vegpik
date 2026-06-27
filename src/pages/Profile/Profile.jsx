@@ -4,6 +4,19 @@ import { useGlobalState } from '../../context/GlobalStateContext';
 import { ROUTES } from '../../utils/constants';
 import apiClient from '../../services/api';
 import styles from './Profile.module.css';
+import SubPageHeader from '../../components/layout/SubPageHeader/SubPageHeader';
+
+const PRESET_AVATARS = [
+  { emoji: '🍅', color: '#FEE2E2', label: 'Tomato' },
+  { emoji: '🥦', color: '#D1FAE5', label: 'Broccoli' },
+  { emoji: '🥕', color: '#FFEDD5', label: 'Carrot' },
+  { emoji: '🥑', color: '#E0F2FE', label: 'Avocado' },
+  { emoji: '🍓', color: '#FFF1F2', label: 'Strawberry' },
+  { emoji: '🍋', color: '#FEF9C3', label: 'Lemon' },
+  { emoji: '🍇', color: '#F3E8FF', label: 'Grapes' },
+  { emoji: '🍉', color: '#ECFDF5', label: 'Watermelon' },
+  { emoji: '🍎', color: '#FEF2F2', label: 'Apple' },
+];
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -22,18 +35,67 @@ const Profile = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [avatar, setAvatar] = useState('');
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState('');
 
   // Address form fields
   const [addrTitle, setAddrTitle] = useState('Home');
-  const [addressLine1, setAddressLine1] = useState('');
-  const [addressLine2, setAddressLine2] = useState('');
-  const [city, setCity] = useState('');
-  const [state, setState] = useState('');
   const [receiverName, setReceiverName] = useState('');
   const [receiverMobile, setReceiverMobile] = useState('');
+  const [city, setCity] = useState('Kurnool');
+  const [area, setArea] = useState('');
+  const [flatNo, setFlatNo] = useState('');
+  const [landmark, setLandmark] = useState('');
   const [isDefault, setIsDefault] = useState(false);
+
+  const getAvatarColor = (url) => {
+    if (!url) return '#FEE2E2'; // Default light pink background
+    const match = PRESET_AVATARS.find(a => a.emoji === url);
+    return match ? match.color : '#F1F5F9'; // Custom image gets light grey background
+  };
+
+  const ProfileAvatar = ({ url, firstName, isCircle = true }) => {
+    const [imgFailed, setImgFailed] = useState(false);
+
+    useEffect(() => {
+      setImgFailed(false);
+    }, [url]);
+
+    if (!url || imgFailed) {
+      return (
+        <div className={isCircle ? styles.avatarPlaceholder : styles.modalAvatarPlaceholder}>
+          {firstName ? firstName[0].toUpperCase() : 'U'}
+        </div>
+      );
+    }
+
+    const isEmoji = !url.includes('/') && !url.includes('.');
+    if (isEmoji) {
+      return <span style={{ fontSize: isCircle ? '2.5rem' : '3.5rem', display: 'block', lineHeight: 1 }}>{url}</span>;
+    }
+
+    let fullUrl = url;
+    if (url.includes('media.vegpik.com')) {
+      const parts = url.split('media.vegpik.com');
+      const pathAfterDomain = parts[parts.length - 1]; // e.g. "/users/avatar-..." or "/products/..."
+      const baseUrl = import.meta.env.VITE_API_BASE_URL 
+        ? import.meta.env.VITE_API_BASE_URL.replace('/api/v1', '') 
+        : 'http://localhost:3000';
+      fullUrl = `${baseUrl}/uploads${pathAfterDomain}`;
+    } else {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL.replace('/api/v1', '') : 'http://localhost:3000';
+      fullUrl = url.startsWith('http') ? url : `${baseUrl}/${url}`;
+    }
+    return (
+      <img 
+        src={fullUrl} 
+        alt="Profile" 
+        className={isCircle ? styles.avatarImg : styles.modalAvatarImg} 
+        onError={() => setImgFailed(true)}
+      />
+    );
+  };
 
   // Initialize edit fields
   useEffect(() => {
@@ -41,6 +103,7 @@ const Profile = () => {
       setName(`${user.first_name || ''} ${user.last_name || ''}`.trim());
       setEmail(user.email || '');
       setPhone(user.phone_number || '');
+      setAvatar(user.profile_picture_url || '');
     }
   }, [user]);
 
@@ -72,7 +135,8 @@ const Profile = () => {
       const response = await apiClient.put('/user/auth/profile', {
         name,
         email,
-        phone_number: phone
+        phone_number: phone,
+        profile_picture_url: avatar
       });
       if (response && response.data) {
         // Update user details in context & localStorage
@@ -91,16 +155,16 @@ const Profile = () => {
 
   const handleAddressSubmit = async (e) => {
     e.preventDefault();
-    if (!addressLine1 || !city || !receiverName || !receiverMobile) {
+    if (!flatNo || !area || !receiverName || !receiverMobile) {
       alert('Please fill all required fields.');
       return;
     }
     const payload = {
       title: addrTitle,
-      address_line1: addressLine1,
-      address_line2: addressLine2,
+      address_line1: `${flatNo}||${area}`,
+      address_line2: landmark,
       city,
-      state: state || 'State',
+      state: 'Andhra Pradesh',
       latitude: null,
       longitude: null,
       is_default: isDefault,
@@ -108,12 +172,11 @@ const Profile = () => {
       receiver_mobile: receiverMobile
     };
     await saveAddress(payload);
-    setAddressLine1('');
-    setAddressLine2('');
-    setCity('');
-    setState('');
     setReceiverName('');
     setReceiverMobile('');
+    setArea('');
+    setFlatNo('');
+    setLandmark('');
     setIsDefault(false);
     setShowAddForm(false);
   };
@@ -136,16 +199,7 @@ const Profile = () => {
   return (
     <div className={styles.profileContainer}>
       
-      {/* ─── GREEN PROFILE HEADER ─── */}
-      <header className={styles.greenHeader}>
-        <button className={styles.backBtn} onClick={() => navigate(-1)} aria-label="Back">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-        </button>
-        <h1 className={styles.headerTitle}>My Profile</h1>
-      </header>
+      <SubPageHeader title="My Profile" />
 
       {/* ─── PROFILE CONTENT CONTAINER ─── */}
       <div className={styles.profileContent}>
@@ -153,14 +207,8 @@ const Profile = () => {
         {/* User Card */}
         <div className={styles.userCard}>
           <div className={styles.avatarSection}>
-            <div className={styles.avatarCircle}>
-              {user.profile_picture_url ? (
-                <img src={user.profile_picture_url} alt="Profile" className={styles.avatarImg} />
-              ) : (
-                <div className={styles.avatarPlaceholder}>
-                  {user.first_name ? user.first_name[0].toUpperCase() : 'T'}
-                </div>
-              )}
+            <div className={styles.avatarCircle} style={{ backgroundColor: getAvatarColor(user.profile_picture_url) }}>
+              <ProfileAvatar url={user.profile_picture_url} firstName={user.first_name} isCircle={true} />
               {/* Small camera edit overlay */}
               <label className={styles.cameraOverlay} htmlFor="avatarUpload">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -208,7 +256,7 @@ const Profile = () => {
         {/* Menu Card Options */}
         <div className={styles.menuCard}>
           {/* Order History */}
-          <div className={styles.menuRow} onClick={() => { fetchOrders(); setShowOrdersModal(true); }}>
+          <div className={styles.menuRow} onClick={() => navigate('/order-again')}>
             <div className={styles.menuRowLeft}>
               <div className={styles.rowIconWrapper}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -225,7 +273,7 @@ const Profile = () => {
           </div>
 
           {/* Address Book */}
-          <div className={styles.menuRow} onClick={() => setShowAddressModal(true)}>
+          <div className={styles.menuRow} onClick={() => navigate(ROUTES.ADDRESS_BOOK)}>
             <div className={styles.menuRowLeft}>
               <div className={styles.rowIconWrapper}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -292,7 +340,7 @@ const Profile = () => {
           </div>
 
           {/* Privacy Policy */}
-          <div className={styles.menuRow} onClick={() => alert('Privacy Policy: All details secured.')}>
+          <div className={styles.menuRow} onClick={() => navigate(ROUTES.PRIVACY)}>
             <div className={styles.menuRowLeft}>
               <div className={styles.rowIconWrapper}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -308,7 +356,7 @@ const Profile = () => {
           </div>
 
           {/* Terms & Conditions */}
-          <div className={styles.menuRow} onClick={() => alert('Terms & Conditions: Standard terms apply.')}>
+          <div className={styles.menuRow} onClick={() => navigate(ROUTES.TERMS)}>
             <div className={styles.menuRowLeft}>
               <div className={styles.rowIconWrapper}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -345,8 +393,44 @@ const Profile = () => {
               <form onSubmit={handleEditProfile} className={styles.profileForm}>
                 {editError && <p style={{ color: '#ef4444', fontSize: '0.85rem' }}>{editError}</p>}
                 
+                {/* Modal Avatar Selection */}
+                <div className={styles.modalAvatarSection}>
+                  <div className={styles.modalAvatarCircle} style={{ backgroundColor: getAvatarColor(avatar) }}>
+                    <ProfileAvatar url={avatar} firstName={name} isCircle={false} />
+                    <label className={styles.cameraOverlay} htmlFor="modalAvatarUpload">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                        <circle cx="12" cy="13" r="4"></circle>
+                      </svg>
+                    </label>
+                    <input 
+                      type="file" 
+                      id="modalAvatarUpload" 
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                      onChange={async (e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          const formData = new FormData();
+                          formData.append('avatar', e.target.files[0]);
+                          try {
+                            const response = await apiClient.post('/user/auth/upload', formData, {
+                              headers: { 'Content-Type': 'multipart/form-data' }
+                            });
+                            if (response && response.data && response.data.url) {
+                              setAvatar(response.data.url);
+                            }
+                          } catch (err) {
+                            alert('Failed to upload profile picture.');
+                          }
+                        }
+                      }}
+                    />
+                  </div>
+                  <span className={styles.avatarUploadLabel}>Tap camera to upload custom photo</span>
+                </div>
+
                 <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>Full Name *</label>
+                  <label className={styles.formLabel}>Full Name</label>
                   <input 
                     type="text" 
                     value={name} 
@@ -367,7 +451,7 @@ const Profile = () => {
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>Mobile Number</label>
+                  <label className={styles.formLabel}>Phone Number</label>
                   <input 
                     type="text" 
                     value={phone} 
@@ -376,12 +460,38 @@ const Profile = () => {
                   />
                 </div>
 
+                {/* Choose Your Organic Avatar */}
+                <div className={styles.avatarSelectionGroup}>
+                  <label className={styles.formLabel}>Choose Your Organic Avatar</label>
+                  <div className={styles.avatarOptionsGrid}>
+                    <button
+                      type="button"
+                      className={`${styles.avatarOptionBtn} ${!avatar ? styles.avatarOptionBtnActive : ''}`}
+                      onClick={() => setAvatar('')}
+                      style={{ backgroundColor: '#F1F5F9' }}
+                    >
+                      <span className={styles.avatarOptionNone}>None</span>
+                    </button>
+                    {PRESET_AVATARS.map((item) => (
+                      <button
+                        key={item.label}
+                        type="button"
+                        className={`${styles.avatarOptionBtn} ${avatar === item.emoji ? styles.avatarOptionBtnActive : ''}`}
+                        onClick={() => setAvatar(item.emoji)}
+                        style={{ backgroundColor: item.color }}
+                      >
+                        <span>{item.emoji}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 <div className={styles.formActions}>
-                  <button type="submit" className={styles.submitBtn} disabled={editLoading}>
-                    {editLoading ? 'Saving...' : 'Save Changes'}
-                  </button>
                   <button type="button" className={styles.cancelBtn} onClick={() => setShowEditModal(false)}>
                     Cancel
+                  </button>
+                  <button type="submit" className={styles.submitBtn} disabled={editLoading} style={{ background: '#00a36c' }}>
+                    {editLoading ? 'Saving...' : 'Save'}
                   </button>
                 </div>
               </form>
@@ -423,7 +533,14 @@ const Profile = () => {
                           <div className={styles.addressOptionDetails}>
                             <span className={styles.activeAddressTitle}>{addr.title}</span>
                             <span className={styles.activeAddressText}>
-                              {addr.address_line1} {addr.address_line2 ? `, ${addr.address_line2}` : ''}, {addr.city}
+                              {(() => {
+                                if (addr.address_line1 && addr.address_line1.includes('||')) {
+                                  const [flat, street] = addr.address_line1.split('||');
+                                  return `${flat}, ${street}`;
+                                }
+                                return addr.address_line1;
+                              })()}
+                              {addr.address_line2 ? `, ${addr.address_line2}` : ''}, {addr.city}
                             </span>
                             <span className={styles.activeAddressReceiver}>
                               For: {addr.receiver_name} ({addr.receiver_mobile})
@@ -468,75 +585,77 @@ const Profile = () => {
                   </div>
 
                   <div className={styles.formGroup}>
-                    <label className={styles.formLabel}>Address Line 1 *</label>
+                    <label className={styles.formLabel}>Receiver Name *</label>
                     <input 
                       type="text" 
-                      placeholder="Flat/House/Office No., Building Name" 
-                      value={addressLine1}
-                      onChange={(e) => setAddressLine1(e.target.value)}
+                      placeholder="Receiver's Full Name" 
+                      value={receiverName}
+                      onChange={(e) => setReceiverName(e.target.value)}
                       className={styles.formInput}
                       required
                     />
                   </div>
 
                   <div className={styles.formGroup}>
-                    <label className={styles.formLabel}>Address Line 2 (Landmark)</label>
+                    <label className={styles.formLabel}>Mobile Number *</label>
                     <input 
-                      type="text" 
-                      placeholder="Nearby landmark (optional)" 
-                      value={addressLine2}
-                      onChange={(e) => setAddressLine2(e.target.value)}
+                      type="tel" 
+                      placeholder="Receiver's Mobile Number" 
+                      value={receiverMobile}
+                      onChange={(e) => setReceiverMobile(e.target.value.replace(/[^0-9]/g, ''))}
+                      maxLength={10}
                       className={styles.formInput}
+                      required
                     />
                   </div>
 
-                  <div className={styles.formRow}>
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel}>City *</label>
-                      <input 
-                        type="text" 
-                        placeholder="City" 
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        className={styles.formInput}
-                        required
-                      />
-                    </div>
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel}>State/Emirate</label>
-                      <input 
-                        type="text" 
-                        placeholder="State" 
-                        value={state}
-                        onChange={(e) => setState(e.target.value)}
-                        className={styles.formInput}
-                      />
-                    </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.formLabel}>City *</label>
+                    <input 
+                      type="text" 
+                      value={city}
+                      className={styles.formInput}
+                      disabled
+                      style={{ backgroundColor: '#f1f5f9', color: '#64748b', cursor: 'not-allowed' }}
+                    />
+                    <span style={{ fontSize: '0.75rem', color: '#00a36c', marginTop: '2px', fontWeight: '500' }}>
+                      * We only deliver to this city currently.
+                    </span>
                   </div>
 
-                  <div className={styles.formRow}>
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel}>Receiver Name *</label>
-                      <input 
-                        type="text" 
-                        placeholder="Name of recipient" 
-                        value={receiverName}
-                        onChange={(e) => setReceiverName(e.target.value)}
-                        className={styles.formInput}
-                        required
-                      />
-                    </div>
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel}>Receiver Mobile *</label>
-                      <input 
-                        type="tel" 
-                        placeholder="Mobile number" 
-                        value={receiverMobile}
-                        onChange={(e) => setReceiverMobile(e.target.value)}
-                        className={styles.formInput}
-                        required
-                      />
-                    </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.formLabel}>Area / Colony / Street *</label>
+                    <input 
+                      type="text" 
+                      placeholder="Area / Colony / Sector" 
+                      value={area}
+                      onChange={(e) => setArea(e.target.value)}
+                      className={styles.formInput}
+                      required
+                    />
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label className={styles.formLabel}>Flat / House / Building *</label>
+                    <input 
+                      type="text" 
+                      placeholder="House No. / Building / Floor" 
+                      value={flatNo}
+                      onChange={(e) => setFlatNo(e.target.value)}
+                      className={styles.formInput}
+                      required
+                    />
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label className={styles.formLabel}>Landmark</label>
+                    <input 
+                      type="text" 
+                      placeholder="Nearby Landmark (e.g. Near Mall)" 
+                      value={landmark}
+                      onChange={(e) => setLandmark(e.target.value)}
+                      className={styles.formInput}
+                    />
                   </div>
 
                   <div className={styles.formGroup}>
@@ -589,7 +708,7 @@ const Profile = () => {
                           Status: <span style={{ color: ord.status === 'delivered' ? '#16a34a' : '#ea580c', fontWeight: 'bold' }}>{ord.status.toUpperCase()}</span>
                         </span>
                         <span className={styles.activeAddressText} style={{ marginTop: '4px', fontWeight: '600' }}>
-                          Total: ₹{ord.total_price}
+                          Total: ₹{ord.total_amount}
                         </span>
                       </div>
                     </div>

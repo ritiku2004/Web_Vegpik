@@ -10,7 +10,7 @@ const ProductCard = React.memo(({
   onDecrement,
   className = '',
 }) => {
-  const { name, price, discountPrice, unit, image, stock = 50, isAvailable = true } = product;
+  const { name, price, discountPrice, unit, image, stock = 0, isAvailable = true } = product;
   const hasDiscount = discountPrice && discountPrice < price;
   const isOutOfStock = stock <= 0 || !isAvailable;
 

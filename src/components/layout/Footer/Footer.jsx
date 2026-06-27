@@ -119,15 +119,10 @@ const Footer = () => {
             
             <div className={styles.categoriesSubGrid}>
               {(() => {
-                const fallbackCats = [
-                  { id: '1', name: 'Grocery' },
-                  { id: '2', name: 'Vegetables' },
-                  { id: '3', name: 'Fruits' },
-                  { id: '4', name: 'Snacks' },
-                  { id: '5', name: 'Dairy Products' },
-                  { id: '6', name: 'Cold Drinks' }
-                ];
-                const displayCats = categories.length > 0 ? categories : fallbackCats;
+                const displayCats = categories;
+                if (displayCats.length === 0) {
+                  return <div style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 600 }}>No categories available</div>;
+                }
                 const chunked = [];
                 const sliced = displayCats.slice(0, 6);
                 for (let i = 0; i < sliced.length; i += 2) {

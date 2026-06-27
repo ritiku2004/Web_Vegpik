@@ -1,0 +1,87 @@
+/* Bottom Tab Navigation */
+.bottomNav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 600px;
+  height: 64px;
+  background-color: #ffffff;
+  border-top: 1.5px solid #f1f5f9;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 100;
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.02);
+  box-sizing: border-box;
+}
+
+@media (min-width: 769px) {
+  .bottomNav {
+    display: none !important;
+  }
+}
+
+.navItem {
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  cursor: pointer;
+  padding: 6px;
+  flex-grow: 1;
+  gap: 4px;
+}
+
+.navIcon {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2.2px;
+}
+
+.navLabel {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: -0.1px;
+}
+
+.navItemActive {
+  color: #00a36c;
+  position: relative;
+}
+
+.navItemActive::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 20%;
+  right: 20%;
+  height: 3px;
+  background-color: #00a36c;
+  border-radius: 2px;
+}
+
+.navCartIconWrapper {
+  position: relative;
+}
+
+.navCartBadge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background-color: #ea580c; /* orange notification badge */
+  color: #ffffff;
+  font-size: 0.58rem;
+  font-weight: 850;
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ffffff;
+}

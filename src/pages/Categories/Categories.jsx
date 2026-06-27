@@ -12,15 +12,7 @@ import logoImg from '../../assets/logo.png';
 import bannerBagImg from '../../assets/grocery_banner_bag.png';
 import categoryPlaceholder from '../../assets/category_placeholder.png';
 import styles from './Categories.module.css';
-
-const fallbackCategories = [
-  { id: '1', name: 'Grocery' },
-  { id: '2', name: 'Vegetables' },
-  { id: '3', name: 'Fruits' },
-  { id: '4', name: 'Snacks' },
-  { id: '5', name: 'Dairy Products' },
-  { id: '6', name: 'Cold Drinks' },
-];
+import BottomNav from '../../components/layout/BottomNav/BottomNav';
 
 const Categories = () => {
   const navigate = useNavigate();
@@ -29,6 +21,7 @@ const Categories = () => {
 
   const { cart, addToCart, removeFromCart, user, logout } = useGlobalState();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
   const [categories, setCategories] = useState([]);
   const [banners, setBanners] = useState([]);
   const [products, setProducts] = useState([]);
@@ -58,11 +51,11 @@ const Categories = () => {
         if (fetchedCategories && fetchedCategories.length > 0) {
           setCategories(fetchedCategories);
         } else {
-          setCategories(fallbackCategories);
+          setCategories([]);
         }
       } catch (e) {
-        console.error('Failed to fetch categories, using fallbacks', e);
-        setCategories(fallbackCategories);
+        console.error('Failed to fetch categories', e);
+        setCategories([]);
       }
 
       // 3. Fetch banners
@@ -76,9 +69,10 @@ const Categories = () => {
       // 4. Fetch products
       try {
         const fetchedProducts = await productService.getProducts();
-        setProducts(fetchedProducts);
+        setProducts(fetchedProducts || []);
       } catch (e) {
         console.error('Failed to fetch products', e);
+        setProducts([]);
       }
 
       setLoading(false);
@@ -196,7 +190,7 @@ const Categories = () => {
           </div>
 
           {/* Delivery ETA Pill */}
-          <div className={styles.deliveryPill}>
+          <div className={styles.deliveryPill} onClick={() => navigate(ROUTES.ADDRESS_BOOK)} style={{ cursor: 'pointer' }}>
             <div className={styles.pillLabelContainer}>
               <span className={styles.deliverInLabel}>DELIVER IN</span>
               <span className={styles.deliveryTime}>
@@ -254,8 +248,21 @@ const Categories = () => {
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
                   aria-label="Profile menu"
                 >
-                  {user.profile_picture_url ? (
-                    <img src={user.profile_picture_url} alt="Profile" className={styles.avatarImg} />
+                  {user.profile_picture_url && !avatarError ? (
+                    (!user.profile_picture_url.includes('/') && !user.profile_picture_url.includes('.')) ? (
+                      <div className={styles.avatarPlaceholder} style={{ fontSize: '1.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fee2e2' }}>
+                        {user.profile_picture_url}
+                      </div>
+                    ) : (
+                      <img 
+                        src={user.profile_picture_url.includes('media.vegpik.com') 
+                          ? `${import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL.replace('/api/v1', '') : 'http://localhost:3000'}/uploads${user.profile_picture_url.split('media.vegpik.com')[1]}` 
+                          : (user.profile_picture_url.startsWith('http') ? user.profile_picture_url : `${import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL.replace('/api/v1', '') : 'http://localhost:3000'}/${user.profile_picture_url}`)}
+                        alt="Profile" 
+                        className={styles.avatarImg} 
+                        onError={() => setAvatarError(true)}
+                      />
+                    )
                   ) : (
                     <div className={styles.avatarPlaceholder}>
                       {user.first_name ? user.first_name[0].toUpperCase() : 'U'}
@@ -270,6 +277,9 @@ const Categories = () => {
                     </div>
                     <button className={styles.dropdownItemLink} onClick={() => { navigate(ROUTES.PROFILE); setShowProfileMenu(false); }}>
                       My Profile
+                    </button>
+                    <button className={styles.dropdownItemLink} onClick={() => { navigate('/order-again'); setShowProfileMenu(false); }}>
+                      Order Again
                     </button>
                     <button className={styles.dropdownItem} onClick={() => { logout(); setShowProfileMenu(false); }}>
                       Logout
@@ -311,26 +321,30 @@ const Categories = () => {
 
             {/* Desktop grid */}
             <section className={styles.desktopGridSection}>
-              <div className={styles.desktopCategoriesGrid}>
-                {categories.map((cat) => (
-                  <div 
-                    key={cat.id} 
-                    className={styles.desktopCategoryCard}
-                    onClick={() => navigate(`${ROUTES.CATEGORIES}?cat=${cat.id}`)}
-                  >
-                    <div className={styles.desktopCategoryImageContainer}>
-                      <img 
-                        src={cat.image || categoryPlaceholder} 
-                        alt={cat.name} 
-                        className={styles.desktopCategoryImage} 
-                      />
+              {categories.length === 0 ? (
+                <div className={styles.emptyProducts}>No categories available</div>
+              ) : (
+                <div className={styles.desktopCategoriesGrid}>
+                  {categories.map((cat) => (
+                    <div 
+                      key={cat.id} 
+                      className={styles.desktopCategoryCard}
+                      onClick={() => navigate(`${ROUTES.CATEGORIES}?cat=${cat.id}`)}
+                    >
+                      <div className={styles.desktopCategoryImageContainer}>
+                        <img 
+                          src={cat.image || categoryPlaceholder} 
+                          alt={cat.name} 
+                          className={styles.desktopCategoryImage} 
+                        />
+                      </div>
+                      <div className={styles.desktopCategoryNameContainer}>
+                        <span className={styles.desktopCategoryName}>{cat.name}</span>
+                      </div>
                     </div>
-                    <div className={styles.desktopCategoryNameContainer}>
-                      <span className={styles.desktopCategoryName}>{cat.name}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </section>
 
             {/* Mobile banner */}
@@ -385,34 +399,38 @@ const Categories = () => {
 
             {/* Mobile list */}
             <section className={styles.mobileListSection}>
-              <div className={styles.categoriesContainer}>
-                {categories.map((cat) => (
-                  <div 
-                    key={cat.id} 
-                    className={styles.categoryRowCard}
-                    onClick={() => navigate(`${ROUTES.CATEGORIES}?cat=${cat.id}`)}
-                  >
-                    <div className={styles.categoryRowImageWrapper}>
-                      <img 
-                        src={cat.image || categoryPlaceholder} 
-                        alt={cat.name} 
-                        className={styles.categoryRowImage} 
-                      />
-                    </div>
-                    <div className={styles.categoryRowTextCol}>
-                      <h3 className={styles.categoryRowTitle}>{cat.name}</h3>
-                      <span className={styles.categoryRowSubtitle}>Explore Products</span>
-                    </div>
-                    <div className={styles.categoryRowArrowWrapper}>
-                      <div className={styles.categoryRowChevron}>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                          <polyline points="9 18 15 12 9 6" />
-                        </svg>
+              {categories.length === 0 ? (
+                <div className={styles.emptyProducts}>No categories available</div>
+              ) : (
+                <div className={styles.categoriesContainer}>
+                  {categories.map((cat) => (
+                    <div 
+                      key={cat.id} 
+                      className={styles.categoryRowCard}
+                      onClick={() => navigate(`${ROUTES.CATEGORIES}?cat=${cat.id}`)}
+                    >
+                      <div className={styles.categoryRowImageWrapper}>
+                        <img 
+                          src={cat.image || categoryPlaceholder} 
+                          alt={cat.name} 
+                          className={styles.categoryRowImage} 
+                        />
+                      </div>
+                      <div className={styles.categoryRowTextCol}>
+                        <h3 className={styles.categoryRowTitle}>{cat.name}</h3>
+                        <span className={styles.categoryRowSubtitle}>Explore Products</span>
+                      </div>
+                      <div className={styles.categoryRowArrowWrapper}>
+                        <div className={styles.categoryRowChevron}>
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                            <polyline points="9 18 15 12 9 6" />
+                          </svg>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </section>
           </>
         ) : (
@@ -461,7 +479,7 @@ const Categories = () => {
 
                 {activeProducts.length === 0 ? (
                   <div className={styles.emptyProducts}>
-                    No products found in this category.
+                    No products available
                   </div>
                 ) : (
                   <div className={styles.detailProductsGrid}>
@@ -486,43 +504,7 @@ const Categories = () => {
       </div>
 
       {/* ─── MOBILE BOTTOM TABS ─── */}
-      <div className={styles.bottomTabs}>
-        <button className={styles.tabItem} onClick={() => navigate(ROUTES.HOME)}>
-          <svg className={styles.tabIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-            <polyline points="9 22 9 12 15 12 15 22" />
-          </svg>
-          <span className={styles.tabLabel}>Home</span>
-        </button>
-        <button 
-          className={`${styles.tabItem} ${styles.tabItemActive}`} 
-          onClick={() => navigate(ROUTES.CATEGORIES)}
-        >
-          <svg className={styles.tabIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
-            <rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
-          </svg>
-          <span className={styles.tabLabel}>Categories</span>
-        </button>
-        <button className={styles.tabItem} onClick={() => navigate(ROUTES.CART)}>
-          <div className={styles.cartIconWrapper}>
-            <svg className={styles.tabIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-            </svg>
-            {cartTotalQuantity > 0 && (
-              <span className={styles.cartBadge}>{cartTotalQuantity}</span>
-            )}
-          </div>
-          <span className={styles.tabLabel}>Cart</span>
-        </button>
-        <button className={styles.tabItem}>
-          <svg className={styles.tabIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
-          </svg>
-          <span className={styles.tabLabel}>Order Again</span>
-        </button>
-      </div>
+      <BottomNav />
     </div>
   );
 };

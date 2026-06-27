@@ -12,118 +12,12 @@ import logoImg from '../../assets/logo.png';
 import bannerBagImg from '../../assets/grocery_banner_bag.png';
 import categoryPlaceholder from '../../assets/category_placeholder.png';
 import styles from './Home.module.css';
-const fallbackCategories = [
-  { id: '1', name: 'Grocery' },
-  { id: '2', name: 'Vegetables' },
-  { id: '3', name: 'Fruits' },
-  { id: '4', name: 'Snacks' },
-  { id: '5', name: 'Dairy Products' },
-  { id: '6', name: 'Cold Drinks' },
-];
-
-const fallbackProducts = [
-  {
-    id: 'g1',
-    name: 'Aashirvaad Atta (1 kg)',
-    price: 1440,
-    discountPrice: 1440,
-    unit: '1.00 kg',
-    categoryId: '1',
-    categoryName: 'Grocery',
-    type: 'trending',
-    isAvailable: true,
-    stock: 10
-  },
-  {
-    id: 'g2',
-    name: 'Aashirvaad Atta (5 kg)',
-    price: 1410,
-    discountPrice: 1410,
-    unit: '5.00 kg',
-    categoryId: '1',
-    categoryName: 'Grocery',
-    type: 'best deal',
-    isAvailable: true,
-    stock: 10
-  },
-  {
-    id: 'g3',
-    name: 'Chana Dal',
-    price: 2220,
-    discountPrice: 2220,
-    unit: '1.00 pack',
-    categoryId: '1',
-    categoryName: 'Grocery',
-    type: 'trending',
-    isAvailable: true,
-    stock: 10
-  },
-  {
-    id: 'g4',
-    name: 'Colgate (12 pcs + 1)',
-    price: 216,
-    discountPrice: 216,
-    unit: '13.00 piece',
-    categoryId: '1',
-    categoryName: 'Grocery',
-    type: 'best deal',
-    isAvailable: true,
-    stock: 10
-  },
-  {
-    id: 'g5',
-    name: 'Colgate (12 pcs)',
-    price: 108,
-    discountPrice: 108,
-    unit: '12.00 piece',
-    categoryId: '1',
-    categoryName: 'Grocery',
-    type: 'trending',
-    isAvailable: true,
-    stock: 10
-  },
-  {
-    id: 'g6',
-    name: 'Dettol Soap (40 pcs)',
-    price: 860,
-    discountPrice: 860,
-    unit: '41.00 piece',
-    categoryId: '1',
-    categoryName: 'Grocery',
-    type: 'best deal',
-    isAvailable: true,
-    stock: 10
-  },
-  {
-    id: 'v1',
-    name: 'Fresh Lady Finger (Bhindi)',
-    price: 40,
-    discountPrice: 35,
-    unit: '1.00 kg',
-    categoryId: '2',
-    categoryName: 'Vegetables',
-    type: 'best deal',
-    isAvailable: true,
-    stock: 20
-  },
-  {
-    id: 'v2',
-    name: 'Fresh Bitter Gourd (Karela)',
-    price: 50,
-    discountPrice: 45,
-    unit: '500.00 g',
-    categoryId: '2',
-    categoryName: 'Vegetables',
-    type: 'trending',
-    isAvailable: true,
-    stock: 20
-  }
-];
-
+import BottomNav from '../../components/layout/BottomNav/BottomNav';
 const Home = () => {
   const navigate = useNavigate();
   const { cart, addToCart, removeFromCart, user, logout } = useGlobalState();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
   const [categories, setCategories] = useState([]);
   const [banners, setBanners] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -154,11 +48,11 @@ const Home = () => {
         if (fetchedCategories && fetchedCategories.length > 0) {
           setCategories(fetchedCategories);
         } else {
-          setCategories(fallbackCategories);
+          setCategories([]);
         }
       } catch (e) {
-        console.error('Failed to fetch categories, using fallbacks', e);
-        setCategories(fallbackCategories);
+        console.error('Failed to fetch categories', e);
+        setCategories([]);
       }
 
       // 3. Fetch banners
@@ -175,11 +69,11 @@ const Home = () => {
         if (fetchedProducts && fetchedProducts.length > 0) {
           setProducts(fetchedProducts);
         } else {
-          setProducts(fallbackProducts);
+          setProducts([]);
         }
       } catch (e) {
-        console.error('Failed to fetch products, using fallbacks', e);
-        setProducts(fallbackProducts);
+        console.error('Failed to fetch products', e);
+        setProducts([]);
       }
 
       setLoading(false);
@@ -281,7 +175,7 @@ const Home = () => {
           </div>
 
           {/* Delivery ETA Pill */}
-          <div className={styles.deliveryPill}>
+          <div className={styles.deliveryPill} onClick={() => navigate(ROUTES.ADDRESS_BOOK)} style={{ cursor: 'pointer' }}>
             <div className={styles.pillLabelContainer}>
               <span className={styles.deliverInLabel}>DELIVER IN</span>
               <span className={styles.deliveryTime}>
@@ -340,8 +234,21 @@ const Home = () => {
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
                   aria-label="Profile menu"
                 >
-                  {user.profile_picture_url ? (
-                    <img src={user.profile_picture_url} alt="Profile" className={styles.avatarImg} />
+                  {user.profile_picture_url && !avatarError ? (
+                    (!user.profile_picture_url.includes('/') && !user.profile_picture_url.includes('.')) ? (
+                      <div className={styles.avatarPlaceholder} style={{ fontSize: '1.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fee2e2' }}>
+                        {user.profile_picture_url}
+                      </div>
+                    ) : (
+                      <img 
+                        src={user.profile_picture_url.includes('media.vegpik.com') 
+                          ? `${import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL.replace('/api/v1', '') : 'http://localhost:3000'}/uploads${user.profile_picture_url.split('media.vegpik.com')[1]}` 
+                          : (user.profile_picture_url.startsWith('http') ? user.profile_picture_url : `${import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL.replace('/api/v1', '') : 'http://localhost:3000'}/${user.profile_picture_url}`)}
+                        alt="Profile" 
+                        className={styles.avatarImg} 
+                        onError={() => setAvatarError(true)}
+                      />
+                    )
                   ) : (
                     <div className={styles.avatarPlaceholder}>
                       {user.first_name ? user.first_name[0].toUpperCase() : 'U'}
@@ -356,6 +263,9 @@ const Home = () => {
                     </div>
                     <button className={styles.dropdownItemLink} onClick={() => { navigate(ROUTES.PROFILE); setShowProfileMenu(false); }}>
                       My Profile
+                    </button>
+                    <button className={styles.dropdownItemLink} onClick={() => { navigate('/order-again'); setShowProfileMenu(false); }}>
+                      Order Again
                     </button>
                     <button className={styles.dropdownItem} onClick={() => { logout(); setShowProfileMenu(false); }}>
                       Logout
@@ -469,54 +379,65 @@ const Home = () => {
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>Shop by Category</h2>
-            <button className={styles.seeAllBtn} onClick={() => navigate(ROUTES.CATEGORIES)}>
-              See All <span className={styles.arrowIcon}>&rarr;</span>
-            </button>
+            {displayedCategories.length > 0 && (
+              <button className={styles.seeAllBtn} onClick={() => navigate(ROUTES.CATEGORIES)}>
+                See All <span className={styles.arrowIcon}>&rarr;</span>
+              </button>
+            )}
           </div>
-          <div className={styles.categoriesGrid}>
-            {displayedCategories.map((cat) => (
-              <div 
-                key={cat.id} 
-                className={styles.categoryCard}
-                onClick={() => navigate(`${ROUTES.CATEGORIES}?cat=${cat.id}`)}
-              >
-                <div className={styles.categoryImageContainer}>
-                  <img src={cat.image || categoryPlaceholder} alt={cat.name} className={styles.categoryImage} />
+          {displayedCategories.length === 0 ? (
+            <div className={styles.emptyState}>No categories available</div>
+          ) : (
+            <div className={styles.categoriesGrid}>
+              {displayedCategories.map((cat) => (
+                <div 
+                  key={cat.id} 
+                  className={styles.categoryCard}
+                  onClick={() => navigate(`${ROUTES.CATEGORIES}?cat=${cat.id}`)}
+                >
+                  <div className={styles.categoryImageContainer}>
+                    <img src={cat.image || categoryPlaceholder} alt={cat.name} className={styles.categoryImage} />
+                  </div>
+                  <div className={styles.categoryNameContainer}>
+                    <span className={styles.categoryName}>{cat.name}</span>
+                  </div>
                 </div>
-                <div className={styles.categoryNameContainer}>
-                  <span className={styles.categoryName}>{cat.name}</span>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* ─── DYNAMIC CATEGORY PRODUCT ROWS ─── */}
-        {categoriesWithProducts.map((cat, idx) => (
-          <React.Fragment key={cat.id}>
-            <section className={styles.section}>
-              <div className={styles.sectionHeader}>
-                <h2 className={styles.sectionTitle}>{cat.name}</h2>
-                <button className={styles.seeAllBtn}>
-                  See All <span className={styles.arrowIcon}>&rarr;</span>
-                </button>
-              </div>
-              <div className={styles.horizontalScroll}>
-                {cat.products.map((prod) => (
-                  <div key={prod.id} className={styles.horizontalCardWrapper}>
-                    <ProductCard
-                      product={prod}
-                      cartQuantity={getCartQuantity(prod.id)}
-                      onIncrement={() => handleIncrement(prod)}
-                      onDecrement={() => handleDecrement(prod)}
-                    />
-                  </div>
-                ))}
-              </div>
-            </section>
+        {products.length === 0 ? (
+          <section className={styles.section}>
+            <div className={styles.emptyState}>No products available</div>
+          </section>
+        ) : (
+          categoriesWithProducts.map((cat, idx) => (
+            <React.Fragment key={cat.id}>
+              <section className={styles.section}>
+                <div className={styles.sectionHeader}>
+                  <h2 className={styles.sectionTitle}>{cat.name}</h2>
+                  <button className={styles.seeAllBtn}>
+                    See All <span className={styles.arrowIcon}>&rarr;</span>
+                  </button>
+                </div>
+                <div className={styles.horizontalScroll}>
+                  {cat.products.map((prod) => (
+                    <div key={prod.id} className={styles.horizontalCardWrapper}>
+                      <ProductCard
+                        product={prod}
+                        cartQuantity={getCartQuantity(prod.id)}
+                        onIncrement={() => handleIncrement(prod)}
+                        onDecrement={() => handleDecrement(prod)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </section>
 
-            {/* Mid-page promotional banner: render after 2 category rows (idx === 1) */}
-            {idx === 1 && (
+              {/* Mid-page promotional banner: render after 2 category rows (idx === 1) */}
+              {idx === 1 && (
               <section className={styles.bannerSection}>
                 <div 
                   className={styles.promoBanner}
@@ -567,8 +488,9 @@ const Home = () => {
                 </div>
               </section>
             )}
-          </React.Fragment>
-        ))}
+            </React.Fragment>
+          ))
+        )}
 
         {/* ─── TRENDING PRODUCTS ROW ─── */}
 
@@ -598,40 +520,7 @@ const Home = () => {
       </div>
 
       {/* ─── MOBILE BOTTOM TABS ─── */}
-      <div className={styles.bottomTabs}>
-        <button className={`${styles.tabItem} ${styles.tabItemActive}`}>
-          <svg className={styles.tabIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-            <polyline points="9 22 9 12 15 12 15 22" />
-          </svg>
-          <span className={styles.tabLabel}>Home</span>
-        </button>
-        <button className={styles.tabItem} onClick={() => navigate(ROUTES.CATEGORIES)}>
-          <svg className={styles.tabIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
-            <rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
-          </svg>
-          <span className={styles.tabLabel}>Categories</span>
-        </button>
-        <button className={styles.tabItem} onClick={() => navigate(ROUTES.CART)}>
-          <div className={styles.cartIconWrapper}>
-            <svg className={styles.tabIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-            </svg>
-            {cartTotalQuantity > 0 && (
-              <span className={styles.cartBadge}>{cartTotalQuantity}</span>
-            )}
-          </div>
-          <span className={styles.tabLabel}>Cart</span>
-        </button>
-        <button className={styles.tabItem}>
-          <svg className={styles.tabIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
-          </svg>
-          <span className={styles.tabLabel}>Order Again</span>
-        </button>
-      </div>
+      <BottomNav />
 
     </div>
   );

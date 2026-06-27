@@ -1,4 +1,4 @@
-import React from 'react';
+import SubPageHeader from '../../components/layout/SubPageHeader/SubPageHeader';
 import Card from '../../components/common/Card/Card';
 import styles from './Services.module.css';
 
@@ -23,19 +23,18 @@ const Services = () => {
 
   return (
     <div className={styles.servicesContainer}>
-      <div className={styles.header}>
-        <h1>Our Services</h1>
-        <p>Premium farm-to-table solutions customized for your needs.</p>
-      </div>
+      <SubPageHeader title="Our Services" />
 
-      <div className={styles.grid}>
-        {servicesList.map((service, index) => (
-          <Card key={index} hoverable className={styles.serviceCard}>
-            <div className={styles.icon}>{service.icon}</div>
-            <h2>{service.title}</h2>
-            <p>{service.description}</p>
-          </Card>
-        ))}
+      <div className={styles.content}>
+        <div className={styles.grid}>
+          {servicesList.map((service, index) => (
+            <Card key={index} hoverable className={styles.serviceCard}>
+              <div className={styles.icon}>{service.icon}</div>
+              <h2>{service.title}</h2>
+              <p>{service.description}</p>
+            </Card>
+          ))}
+        </div>
       </div>
     </div>
   );

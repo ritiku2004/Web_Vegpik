@@ -1,0 +1,58 @@
+.header {
+  background: linear-gradient(90deg, #0b7a4c 0%, #00a36c 100%);
+  padding: 16px 24px;
+  color: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 10px rgba(11, 122, 76, 0.1);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.headerContainer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.backButton:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.arrowIcon {
+  width: 22px;
+  height: 22px;
+}
+
+.headerTitle {
+  font-size: 1.25rem;
+  font-weight: 750;
+  margin: 0;
+  color: #ffffff !important;
+  text-align: left;
+  letter-spacing: -0.2px;
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 14px 16px;
+  }
+  .headerTitle {
+    font-size: 1.15rem;
+  }
+}

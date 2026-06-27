@@ -1,8 +1,13 @@
 .servicesContainer {
+  width: 100%;
+  margin: 0 auto;
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.content {
   max-width: var(--max-width);
   margin: 0 auto;
   padding: var(--spacing-xl) var(--spacing-lg);
-  animation: fadeIn 0.4s ease-out forwards;
 }
 
 .header {

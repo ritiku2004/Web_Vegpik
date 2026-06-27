@@ -926,4 +926,14 @@
   background-color: #f1f5f9;
 }
 
+.emptyState {
+  text-align: center;
+  padding: 48px 24px;
+  font-size: 1.15rem;
+  color: #64748b;
+  font-weight: 600;
+  width: 100%;
+}
+
+
 
