@@ -104,9 +104,9 @@ const Footer = () => {
           <div className={styles.linksCol}>
             <h4 className={styles.colTitle}>USEFUL LINKS</h4>
             <ul className={styles.linksList}>
-              <li><Link to="#">Privacy Policy</Link></li>
-              <li><Link to="#">Terms of Service</Link></li>
-              <li><Link to="#">Contact Support</Link></li>
+              <li><Link to={ROUTES.PRIVACY}>Privacy Policy</Link></li>
+              <li><Link to={ROUTES.TERMS}>Terms of Service</Link></li>
+              <li><Link to={ROUTES.CONTACT}>Contact Support</Link></li>
             </ul>
           </div>
 

@@ -58,10 +58,12 @@ export default function ProductCard({ product }) {
           </div>
         )}
 
-        {/* Veg Icon (Bottom Left) */}
-        <div className={styles.vegIcon}>
-          <div className={styles.vegDot} />
-        </div>
+        {/* Discount badge */}
+        {hasDiscount && (
+          <div className={styles.discountBadge}>
+            {discountPercent}% OFF
+          </div>
+        )}
 
         {/* Overlapping ADD Button (Bottom Right) */}
         {!isOutOfStock && (
@@ -103,12 +105,7 @@ export default function ProductCard({ product }) {
 
 
 
-        {/* Discount badge */}
-        {hasDiscount && (
-          <div className={styles.discountText}>
-            {discountPercent}% OFF
-          </div>
-        )}
+
 
         {/* Price Row */}
         <div className={styles.priceRow}>
