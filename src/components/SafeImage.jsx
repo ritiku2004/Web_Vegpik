@@ -5,8 +5,8 @@ import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../services/api';
 
 export default function SafeImage({ src, alt, className, style, width, height }) {
-  // SVG vector green organic placeholder for fresh vegetables/fruits
-  const fallbackSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><rect width="100" height="100" fill="%23E8F5E9"/><circle cx="50" cy="50" r="25" fill="%23A5D6A7"/><path d="M50 25c-5 0-10 10-10 15s5 10 10 10 10-5 10-10-5-15-10-15z" fill="%2381C784"/><path d="M50 20c-1 0-3 3-3 5s2 4 3 4 3-2 3-4-2-5-3-5z" fill="%234CAF50"/></svg>`;
+  // Simple, minimal placeholder: a light grey background with a standard image icon
+  const fallbackSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%239ca3af" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="background-color: %23f3f4f6;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`;
 
   const [imgSrc, setImgSrc] = useState(fallbackSvg);
 

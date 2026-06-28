@@ -18,6 +18,7 @@ function CategoriesContent() {
   const navigate = useNavigate();
   const catParam = searchParams.get('cat');
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
 
   useEffect(() => {
     setSelectedCategoryId(catParam);
@@ -30,6 +31,7 @@ function CategoriesContent() {
       navigate(`/categories`);
     }
     setSelectedCategoryId(id);
+    setShowMobileSidebar(false);
   };
 
   const { data: banners = [] } = useQuery({
@@ -151,10 +153,30 @@ function CategoriesContent() {
             <h1 className={styles.headerTitle}>
               {categories.find((c) => c.id === selectedCategoryId)?.name || 'Products'}
             </h1>
-            <button className={styles.headerFilterBtn} aria-label="Filters">
+            <button className={styles.headerFilterBtn} aria-label="Filters" onClick={() => setShowMobileSidebar(!showMobileSidebar)}>
               <SlidersHorizontal size={22} />
             </button>
           </div>
+
+          {/* Mobile Sidebar Modal overlay */}
+          {showMobileSidebar && (
+            <div className={styles.mobileSidebarOverlay} onClick={() => setShowMobileSidebar(false)}>
+              <div className={styles.mobileSidebarContent} onClick={(e) => e.stopPropagation()}>
+                <h3 className={styles.mobileSidebarTitle}>Select Category</h3>
+                <div className={styles.mobileSidebarList}>
+                  {categories.map((cat) => (
+                    <button
+                      key={cat.id}
+                      className={`${styles.sidebarBtn} ${selectedCategoryId === cat.id ? styles.activeSidebarBtn : ''}`}
+                      onClick={() => handleCategorySelect(cat.id)}
+                    >
+                      {cat.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Breadcrumb back navigation button for Desktop */}
           <button 
