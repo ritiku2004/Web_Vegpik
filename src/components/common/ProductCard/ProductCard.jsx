@@ -82,9 +82,9 @@ const ProductCard = React.memo(({
 
         {/* Price Row */}
         <div className={styles.priceRow}>
-          <span className={styles.price}>₹{discountPrice || price}</span>
+          <span className={styles.price}>AED {Number(discountPrice || price).toFixed(2)}</span>
           {hasDiscount && (
-            <span className={styles.originalPrice}>₹{price}</span>
+            <span className={styles.originalPrice}>AED {Number(price).toFixed(2)}</span>
           )}
         </div>
       </div>

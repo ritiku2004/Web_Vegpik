@@ -1,0 +1,475 @@
+.profilePage {
+  min-height: 100vh;
+  background: #f8fafc;
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #1e293b;
+}
+
+/* ----- Header ----- */
+.pageHeader {
+  background: linear-gradient(135deg, #15803d 0%, #16a34a 50%, #22c55e 100%);
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(21, 128, 61, 0.25);
+}
+
+.backBtn {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  transition: background 0.2s;
+}
+
+.backBtn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.pageTitle {
+  font-size: 18px;
+  font-weight: 800;
+  color: white;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+/* ----- Content Container ----- */
+.pageContent {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 40px 16px 80px;
+}
+
+/* ----- User Card ----- */
+.profileCard {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  margin-bottom: 20px;
+}
+
+.avatarWrapper {
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.avatarContainer {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: #0f7643;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 24px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.avatarContainerHovered {
+  transform: scale(1.03);
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarEmoji {
+  font-size: 32px;
+}
+
+.avatarText {
+  color: white;
+}
+
+.cameraIconOverlay {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  background: #0f7643;
+  border: 2px solid white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.profileDetails {
+  flex: 1;
+  min-width: 0;
+}
+
+.detailsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.userName {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px;
+}
+
+.userEmail {
+  font-size: 13.5px;
+  color: #64748b;
+  margin: 0 0 2px;
+  word-break: break-all;
+}
+
+.userPhone {
+  font-size: 12.5px;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.editProfileBtn {
+  background: #e8f8f0;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #0f7643;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.editProfileBtn:hover {
+  background: #d1fae5;
+  transform: scale(1.05);
+}
+
+/* ----- Menu Options Container ----- */
+.menuContainer {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  width: 100%;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.15s ease;
+  text-align: left;
+}
+
+.menuItem:last-child {
+  border-bottom: none;
+}
+
+.menuItem:hover {
+  background: #f8fafc;
+}
+
+.menuItemLeft {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #0f7643;
+}
+
+.menuItemText {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.chevronRight {
+  color: #94a3b8;
+  transition: transform 0.15s ease;
+}
+
+.menuItem:hover .chevronRight {
+  transform: translateX(2px);
+  color: #0f7643;
+}
+
+/* ----- Logout Button ----- */
+.logoutButton {
+  width: 100%;
+  background: #fef2f2;
+  border: 1.5px solid #fca5a5;
+  color: #ef4444;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.logoutButton:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+}
+
+/* ----- Modal Styling ----- */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  padding: 16px;
+  backdrop-filter: blur(4px);
+}
+
+.modalContainer {
+  background: white;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.modalHeader {
+  padding: 18px 24px;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modalTitle {
+  font-size: 17px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.modalCloseBtn {
+  background: #f1f5f9;
+  border: none;
+  cursor: pointer;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.modalCloseBtn:hover {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.modalScrollContent {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* ----- Edit Profile Form ----- */
+.formGroup {
+  margin-bottom: 16px;
+}
+
+.formLabel {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 6px;
+}
+
+.formInput {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #0f172a;
+  background: #f8fafc;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.formInput:focus {
+  border-color: #0f7643;
+  box-shadow: 0 0 0 3px rgba(15, 118, 67, 0.08);
+  background: #ffffff;
+}
+
+.avatarPickerLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  margin: 20px 0 8px;
+  display: block;
+}
+
+.avatarOptionsList {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 4px 0 12px;
+  margin-bottom: 12px;
+}
+
+.avatarOption {
+  min-width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  font-size: 24px;
+}
+
+.selectedAvatarOption {
+  border-color: #0f7643;
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(15, 118, 67, 0.15);
+}
+
+.avatarOptionNoneText {
+  font-size: 11px;
+  font-weight: bold;
+  color: #64748b;
+}
+
+.modalFooter {
+  padding: 16px 24px;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.cancelBtn {
+  background: white;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancelBtn:hover {
+  background: #f8fafc;
+}
+
+.saveBtn {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: none;
+  border-radius: 10px;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 700;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+  transition: all 0.2s;
+}
+
+.saveBtn:hover {
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+}
+
+/* ----- Responsive ----- */
+@media (max-width: 480px) {
+  .pageContent {
+    padding: 16px 12px 60px;
+  }
+
+  .pageHeader {
+    padding: 14px 16px;
+  }
+
+  .profileCard {
+    padding: 16px;
+    gap: 12px;
+    border-radius: 14px;
+  }
+
+  .avatarContainer {
+    width: 56px;
+    height: 56px;
+    font-size: 20px;
+  }
+
+  .userName {
+    font-size: 15px;
+  }
+
+  .userEmail {
+    font-size: 12.5px;
+  }
+
+  .menuItem {
+    padding: 14px 16px;
+  }
+
+  .menuItemText {
+    font-size: 13.5px;
+  }
+
+  .logoutButton {
+    padding: 12px;
+    font-size: 14px;
+  }
+}

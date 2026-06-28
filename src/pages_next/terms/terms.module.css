@@ -1,0 +1,197 @@
+.termsPage {
+  min-height: 100vh;
+  background: #f8fafc;
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #1e293b;
+}
+
+/* ----- Header ----- */
+.pageHeader {
+  background: linear-gradient(135deg, #15803d 0%, #16a34a 50%, #22c55e 100%);
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(21, 128, 61, 0.25);
+}
+
+.backBtn {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  transition: background 0.2s;
+}
+
+.backBtn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.pageTitle {
+  font-size: 18px;
+  font-weight: 800;
+  color: white;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+/* ----- Content Container ----- */
+.pageContent {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px 16px 80px;
+  transition: max-width 0.3s ease;
+}
+
+/* ----- Summary Card ----- */
+.summaryCard {
+  background-color: #e8f8f0;
+  border: 1px solid #d1fae5;
+  border-radius: 16px;
+  padding: 18px 20px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.summaryIconWrap {
+  background: #ffffff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0f7643;
+  box-shadow: 0 2px 6px rgba(15, 118, 67, 0.08);
+  flex-shrink: 0;
+}
+
+.summaryInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summaryTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #064e3b;
+  margin: 0;
+}
+
+.summaryDesc {
+  font-size: 13.5px;
+  color: #065f46;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ----- Heading Section ----- */
+.mainTitleSec {
+  margin-bottom: 20px;
+}
+
+.mainTitle {
+  font-size: 21px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+}
+
+.effectiveDate {
+  font-size: 13.5px;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ----- Cards List ----- */
+.termsList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .termsList {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+.termCard {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cardIconWrap {
+  color: #0f7643;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cardTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.cardContent {
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ----- Responsive ----- */
+@media (max-width: 480px) {
+  .pageContent {
+    padding: 16px 12px 60px;
+  }
+  
+  .pageHeader {
+    padding: 14px 16px;
+  }
+  
+  .pageTitle {
+    font-size: 17px;
+  }
+  
+  .summaryCard {
+    padding: 14px 16px;
+    gap: 12px;
+  }
+
+  .termCard {
+    padding: 16px;
+  }
+
+  .mainTitle {
+    font-size: 19px;
+  }
+}

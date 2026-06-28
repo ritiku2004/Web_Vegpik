@@ -301,7 +301,7 @@ const Home = () => {
             className={styles.promoBanner}
             style={{ 
               background: activeBanner.backgroundColor || 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)',
-              color: activeBanner.textColor || 'inherit'
+              color: '#166534'
             }}
           >
             {/* Left Nav Arrow */}
@@ -443,7 +443,7 @@ const Home = () => {
                   className={styles.promoBanner}
                   style={{ 
                     background: midBanner.backgroundColor || 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)',
-                    color: midBanner.textColor || 'inherit'
+                    color: '#166534'
                   }}
                 >
                   {/* Left Nav Arrow */}

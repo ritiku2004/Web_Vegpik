@@ -27,6 +27,7 @@ const OrderAgain = () => {
   const [loading, setLoading] = useState(true);
   const [avatarError, setAvatarError] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [downloadingReceipt, setDownloadingReceipt] = useState(null);
 
   // Calculate cart count
   const cartCount = cart.reduce((total, item) => total + (item.quantity || 0), 0);
@@ -95,6 +96,37 @@ const OrderAgain = () => {
       }, item.quantity || 1);
     });
     navigate(ROUTES.CART);
+  };
+
+  const handleDownloadReceipt = async (orderId) => {
+    try {
+      setDownloadingReceipt(orderId);
+      
+      const response = await apiClient.get(`/user/orders/${orderId}/receipt`);
+      if (response && response.data && response.data.html) {
+        const { html } = response.data;
+        const printWindow = window.open('', '_blank', 'width=800,height=600');
+        if (printWindow) {
+          printWindow.document.open();
+          printWindow.document.write(html);
+          printWindow.document.close();
+          
+          printWindow.onload = () => {
+            printWindow.focus();
+            printWindow.print();
+          };
+        } else {
+          alert('Please allow popups for this site to print receipts.');
+        }
+      } else {
+        throw new Error('No HTML content received');
+      }
+    } catch (err) {
+      console.error('Download receipt error:', err);
+      alert(err.response?.data?.error || 'Failed to get receipt.');
+    } finally {
+      setDownloadingReceipt(null);
+    }
   };
 
   // Filter orders based on item names or order numbers
@@ -225,7 +257,7 @@ const OrderAgain = () => {
                     <p className={styles.itemSummaryText}>{itemSummary}</p>
                     <div className={styles.priceRow}>
                       <span className={styles.totalPaid}>
-                        Total Paid: <strong>₹{ord.total_amount}</strong>
+                        Total Paid: <strong>AED {Number(ord.total_amount).toFixed(2)}</strong>
                       </span>
                       <span className={styles.deliveredToBadge}>
                         Delivered to {ord.address_title || 'Other'}
@@ -240,12 +272,15 @@ const OrderAgain = () => {
                   <div className={styles.cardActions}>
                     <button 
                       className={styles.viewDetailsBtn} 
-                      onClick={() => navigate(ROUTES.PROFILE)}
+                      onClick={() => handleDownloadReceipt(ord.id)}
+                      disabled={downloadingReceipt === ord.id}
                     >
-                      View Details 
                       <svg className={styles.arrowIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                        <polyline points="9 18 15 12 9 6"></polyline>
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
                       </svg>
+                      {downloadingReceipt === ord.id ? 'Loading...' : 'Receipt'}
                     </button>
                     <button 
                       className={styles.orderAgainBtn} 
