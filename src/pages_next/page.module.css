@@ -510,6 +510,23 @@
   margin: 0;
 }
 
+.addAddressBtn {
+  margin-top: 16px;
+  background-color: #0f7643;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.addAddressBtn:hover {
+  opacity: 0.9;
+}
+
 /* --- Skeleton Loading --------------------------------- */
 .skeletonContainer {
   display: flex;

@@ -9,6 +9,8 @@ import SafeImage from '../../components/SafeImage';
 import Loader from '../../components/Loader';
 import { MOCK_PRODUCTS, INITIAL_ORDERS } from '../data';
 import styles from '../page.module.css';
+import { api } from '../../services/api';
+import { API_BASE_URL } from '../../services/api';
 
 export default function OrdersPage() {
   const navigate = useNavigate();
@@ -32,20 +34,25 @@ export default function OrdersPage() {
   }, [navigate]);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('pastOrders');
-      if (saved) {
-        try {
-          setPastOrders(JSON.parse(saved));
-        } catch (e) {
-          setPastOrders(INITIAL_ORDERS);
+    const fetchOrders = async () => {
+      if (typeof window !== 'undefined') {
+        const token = localStorage.getItem('token');
+        if (token) {
+          try {
+            const res = await api.getUserOrders(token);
+            if (res.data) {
+              setPastOrders(res.data);
+            }
+          } catch (e) {
+            console.error('Failed to fetch orders', e);
+          }
         }
-      } else {
-        setPastOrders(INITIAL_ORDERS);
-        localStorage.setItem('pastOrders', JSON.stringify(INITIAL_ORDERS));
       }
+    };
+    if (!loadingAuth) {
+      fetchOrders();
     }
-  }, []);
+  }, [loadingAuth]);
 
   const handleReorder = (order) => {
     order.items.forEach(orderItem => {
@@ -74,8 +81,15 @@ export default function OrdersPage() {
     }
   };
 
-  const getProductImage = (productId) => {
-    const match = MOCK_PRODUCTS.find(p => p.id === productId);
+  const getProductImage = (item) => {
+    if (item.image_url) {
+      if (item.image_url.startsWith('/') || item.image_url.startsWith('uploads/')) {
+        const base = API_BASE_URL.replace('/api/v1', '');
+        return `${base}${item.image_url.startsWith('/') ? '' : '/'}${item.image_url}`;
+      }
+      return item.image_url;
+    }
+    const match = MOCK_PRODUCTS.find(p => p.id === item.productId || p.id === item.product_id);
     return match ? match.image : 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=150';
   };
 
@@ -89,8 +103,11 @@ export default function OrdersPage() {
         <MapPin size={48} color="#64748b" />
         <h2 className={styles.emptyStateTitle}>Choose Delivery Location</h2>
         <p className={styles.emptyStateText}>
-          Please select a saved address or enter a valid zipcode to check serviceability and view past orders.
+          Please select or add a saved address to view your order history for that location.
         </p>
+        <button className={styles.addAddressBtn} onClick={() => navigate('/addresses')}>
+          Add Address
+        </button>
       </div>
     );
   }
@@ -137,8 +154,10 @@ export default function OrdersPage() {
                     <Package size={16} className={styles.packageIcon} />
                   </div>
                   <div className={styles.orderHeaderInfo}>
-                    <span className={styles.orderNo}>ID: {order.orderNumber}</span>
-                    <span className={styles.orderDate}>{order.date}</span>
+                    <span className={styles.orderNo}>ID: {order.order_number || order.orderNumber}</span>
+                    <span className={styles.orderDate}>
+                      {order.created_at ? new Date(order.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : order.date}
+                    </span>
                   </div>
                 </div>
                 <span 
@@ -161,7 +180,7 @@ export default function OrdersPage() {
                 <div className={styles.thumbnailScroll}>
                   {order.items.slice(0, 4).map((item, idx) => (
                     <div key={idx} className={styles.thumbnailWrapper}>
-                      <SafeImage src={getProductImage(item.productId)} alt={item.name} className={styles.thumbnailImage} />
+                      <SafeImage src={getProductImage(item)} alt={item.product_name || item.name} className={styles.thumbnailImage} />
                       <div className={styles.thumbnailBadge}>
                         <span>{item.quantity}</span>
                       </div>
@@ -179,7 +198,7 @@ export default function OrdersPage() {
               <div className={styles.itemsSummaryRow}>
                 <p className={styles.summaryText}>{itemsSummary}</p>
                 <div className={styles.priceEtaRow}>
-                  <span className={styles.summaryPrice}>Total Paid: AED {Number(order.totalAmount).toFixed(2)}</span>
+                  <span className={styles.summaryPrice}>Total Paid: AED {Number(order.total_amount || order.totalAmount).toFixed(2)}</span>
                   <span className={styles.etaInfo}>
                     {order.status === 'Delivered'
                       ? `Delivered to ${activeAddress?.type || 'Home'}`
@@ -266,10 +285,10 @@ export default function OrdersPage() {
                       {order.items.map((item, idx) => (
                         <div key={idx} className={styles.expandedItemRow}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <SafeImage src={getProductImage(item.productId)} alt={item.name} className={styles.expandedItemImg} />
+                            <SafeImage src={getProductImage(item)} alt={item.product_name || item.name} className={styles.expandedItemImg} />
                             <div>
-                              <h5 className={styles.expandedItemName}>{item.name}</h5>
-                              <span className={styles.expandedItemMeta}>{MOCK_PRODUCTS.find(p => p.id === item.productId)?.unit || '1 unit'}</span>
+                              <h5 className={styles.expandedItemName}>{item.product_name || item.name}</h5>
+                              <span className={styles.expandedItemMeta}>{MOCK_PRODUCTS.find(p => p.id === (item.productId || item.product_id))?.unit || '1 unit'}</span>
                             </div>
                           </div>
                           <div style={{ textAlign: 'right' }}>
@@ -288,9 +307,17 @@ export default function OrdersPage() {
                       <div className={styles.detailRow}>
                         <span className={styles.detailLabel}>Recipient Address</span>
                         <span className={styles.detailValue}>
-                          {activeAddress 
-                            ? `${activeAddress.flatNo}, ${activeAddress.addressLine}, Zip: ${activeAddress.zipcode}`
-                            : 'No Address Specified'}
+                          {order.address_line1 
+                            ? `${order.address_line1}${order.address_line2 ? `, ${order.address_line2}` : ''}, ${order.city || ''}, Zip: ${order.zipcode || order.zip_code || ''}`
+                            : activeAddress 
+                              ? `${activeAddress.flatNo}, ${activeAddress.addressLine}, Zip: ${activeAddress.zipcode}`
+                              : 'No Address Specified'}
+                        </span>
+                      </div>
+                      <div className={styles.detailRow}>
+                        <span className={styles.detailLabel}>Payment Method</span>
+                        <span className={styles.detailValue} style={{ fontWeight: '600' }}>
+                          {order.payment_method || 'COD'} ({order.payment_status || 'PENDING'})
                         </span>
                       </div>
                       <div className={styles.detailRow}>
@@ -306,19 +333,21 @@ export default function OrdersPage() {
                     <div className={styles.expandedDetailsCard}>
                       <div className={styles.detailRow}>
                         <span className={styles.detailLabel}>Items Total</span>
-                        <span className={styles.detailValue}>AED {Number(order.totalAmount).toFixed(2)}</span>
+                        <span className={styles.detailValue}>AED {Number((order.total_amount || order.totalAmount) - (order.delivery_fee || 0) - (order.handling_fee || 0)).toFixed(2)}</span>
                       </div>
                       <div className={styles.detailRow}>
                         <span className={styles.detailLabel}>Delivery Fee</span>
-                        <span className={styles.detailValue} style={{ color: '#22c55e', fontWeight: '700' }}>FREE</span>
+                        <span className={styles.detailValue} style={{ color: Number(order.delivery_fee) > 0 ? '#0f172a' : '#22c55e', fontWeight: Number(order.delivery_fee) > 0 ? '500' : '700' }}>
+                          {Number(order.delivery_fee) > 0 ? `AED ${Number(order.delivery_fee).toFixed(2)}` : 'FREE'}
+                        </span>
                       </div>
                       <div className={styles.detailRow}>
                         <span className={styles.detailLabel}>Packaging Charge</span>
-                        <span className={styles.detailValue}>AED 0.00</span>
+                        <span className={styles.detailValue}>AED {Number(order.handling_fee || 0).toFixed(2)}</span>
                       </div>
                       <div className={`${styles.detailRow} ${styles.expandedTotalRow}`}>
                         <span className={styles.totalLabel}>Grand Total</span>
-                        <span className={styles.totalValue}>AED {Number(order.totalAmount).toFixed(2)}</span>
+                        <span className={styles.totalValue}>AED {Number(order.total_amount || order.totalAmount).toFixed(2)}</span>
                       </div>
                     </div>
                   </div>

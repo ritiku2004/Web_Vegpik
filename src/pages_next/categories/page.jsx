@@ -65,8 +65,11 @@ function CategoriesContent() {
         <span style={{ fontSize: '48px' }}>📍</span>
         <h2 className={styles.emptyStateTitle}>Choose Delivery Location</h2>
         <p className={styles.emptyStateText}>
-          Please select a saved address or enter a valid zipcode to browse category products.
+          Please select or add a saved address to check serviceability and browse category products.
         </p>
+        <button className={styles.addAddressBtn} onClick={() => navigate('/addresses')}>
+          Add Address
+        </button>
       </div>
     );
   }

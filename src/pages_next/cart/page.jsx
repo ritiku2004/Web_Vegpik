@@ -74,6 +74,9 @@ export default function CartPage() {
         <p className={styles.emptyStateText}>
           Please select or add a saved address to check serviceability and browse products.
         </p>
+        <button className={styles.addAddressBtn} onClick={() => navigate('/addresses')}>
+          Add Address
+        </button>
       </div>
     );
   }

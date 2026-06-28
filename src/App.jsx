@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Providers } from './context/Providers';
 import ConditionalLayout from './components/ConditionalLayout';
+import ScrollToTop from './components/ScrollToTop';
 
 // Pages
 import HomePage from './pages_next/page';
@@ -27,6 +28,7 @@ function App() {
   return (
     <Providers>
       <Router>
+        <ScrollToTop />
         <ConditionalLayout>
           <Routes>
             <Route path="/" element={<HomePage />} />

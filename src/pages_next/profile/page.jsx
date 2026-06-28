@@ -242,7 +242,7 @@ export default function ProfilePage() {
     <div className={styles.profilePage}>
       {/* Profile Banner */}
       <div className={styles.pageHeader}>
-        <button className={styles.backBtn} onClick={() => navigate(-1)} aria-label="Go back">
+        <button className={styles.backBtn} onClick={() => navigate('/')} aria-label="Go to home">
           <ArrowLeft size={20} />
         </button>
         <h1 className={styles.pageTitle}>My Profile</h1>
@@ -472,14 +472,6 @@ export default function ProfilePage() {
 
               <label className={styles.avatarPickerLabel}>Choose Your Organic Avatar</label>
               <div className={styles.avatarOptionsList}>
-                <button
-                  className={`${styles.avatarOption} ${!selectedAvatar ? styles.selectedAvatarOption : ''}`}
-                  style={{ backgroundColor: '#E5E7EB' }}
-                  onClick={() => setSelectedAvatar('')}
-                >
-                  <span className={styles.avatarOptionNoneText}>None</span>
-                </button>
-
                 {PRESET_AVATARS.map((avatar) => (
                   <button
                     key={avatar.label}
