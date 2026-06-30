@@ -27,7 +27,7 @@ const Contact = () => {
 
         <div className={styles.contactGrid}>
           {/* WhatsApp Card */}
-          <a href="https://wa.me/15557890123" target="_blank" rel="noopener noreferrer" className={`${styles.contactCard} ${styles.whatsappCard}`}>
+          <a href="https://wa.me/971501234567?text=Hello%20Vegpik%20Support" target="_blank" rel="noopener noreferrer" className={`${styles.contactCard} ${styles.whatsappCard}`}>
             <div className={styles.cardIconWrapper}>
               <svg className={styles.cardIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
@@ -49,7 +49,7 @@ const Contact = () => {
           </a>
 
           {/* Call Card */}
-          <a href="tel:+15557890123" className={styles.contactCard}>
+          <a href="tel:+97143979999" className={styles.contactCard}>
             <div className={styles.cardIconWrapper} style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b' }}>
               <svg className={styles.cardIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
@@ -58,7 +58,7 @@ const Contact = () => {
             <div className={styles.cardContent}>
               <h3 className={styles.cardTitle}>Call Customer Care</h3>
               <p className={styles.cardDescription}>Speak directly with our support team</p>
-              <span className={styles.cardValue}>+1 (555) 789-0123</span>
+              <span className={styles.cardValue}>+971 (4) 397-9999 / +971 50 123 4567</span>
             </div>
             <div className={styles.arrowWrapper}>
               <svg className={styles.arrowIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -88,7 +88,7 @@ const Contact = () => {
           </a>
 
           {/* Corporate Office Card */}
-          <div className={styles.contactCard}>
+          <a href="https://www.google.com/maps/search/?api=1&query=Office+311,+NBQ+Building,+Khalid+Bin+Al+Waleed+Rd,+Al+Hamriya,+Bur+Dubai,+Dubai,+UAE" target="_blank" rel="noopener noreferrer" className={styles.contactCard}>
             <div className={styles.cardIconWrapper} style={{ backgroundColor: 'rgba(107, 114, 128, 0.1)', color: '#6b7280' }}>
               <svg className={styles.cardIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
@@ -97,15 +97,15 @@ const Contact = () => {
             </div>
             <div className={styles.cardContent}>
               <h3 className={styles.cardTitle}>Corporate Office</h3>
-              <p className={styles.cardDescription}>Harvest City, HC 94002</p>
-              <span className={styles.cardValue}>123 Green Avenue, Harvest City</span>
+              <p className={styles.cardDescription}>Bur Dubai, Dubai, UAE</p>
+              <span className={styles.cardValue}>Office 311, NBQ Building, Bur Dubai</span>
             </div>
             <div className={styles.arrowWrapper}>
               <svg className={styles.arrowIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <polyline points="9 18 15 12 9 6"></polyline>
               </svg>
             </div>
-          </div>
+          </a>
         </div>
 
         {/* Operating Hours Alert */}
@@ -150,11 +150,12 @@ const Contact = () => {
                     required
                   >
                     <option value="" disabled>Select a subject...</option>
-                    <option value="orders">Order Status & Tracking</option>
-                    <option value="refunds">Refunds & Cancellations</option>
-                    <option value="delivery">Delivery Issues</option>
-                    <option value="bulk">Bulk / Corporate Inquiry</option>
-                    <option value="other">Feedback / Other</option>
+                    <option value="orders">Order & Delivery Issues</option>
+                    <option value="refunds">Return & Refund Queries</option>
+                    <option value="bulk">Bulk & Corporate Orders</option>
+                    <option value="app">App & Technical Issues</option>
+                    <option value="payment">Payment Queries</option>
+                    <option value="other">Other Inquiry</option>
                   </select>
                   <div className={styles.selectArrow}>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">

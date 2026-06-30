@@ -708,7 +708,7 @@ const Profile = () => {
                           Status: <span style={{ color: ord.status === 'delivered' ? '#16a34a' : '#ea580c', fontWeight: 'bold' }}>{ord.status.toUpperCase()}</span>
                         </span>
                         <span className={styles.activeAddressText} style={{ marginTop: '4px', fontWeight: '600' }}>
-                          Total: ₹{ord.total_amount}
+                          Total: AED {Number(ord.total_amount).toFixed(2)}
                         </span>
                       </div>
                     </div>

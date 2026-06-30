@@ -115,7 +115,7 @@ const Cart = () => {
       return;
     }
 
-    alert(`Proceeding to checkout with total: ₹${grandTotal} for user ${user.email} delivering to ${activeAddress.title}`);
+    alert(`Proceeding to checkout with total: AED ${Number(grandTotal).toFixed(2)} for user ${user.email} delivering to ${activeAddress.title}`);
   };
 
   const handleAddressSubmit = async (e) => {
@@ -305,7 +305,7 @@ const Cart = () => {
                     <h3 className={styles.itemName}>{item.name}</h3>
                     {item.unit && <span className={styles.itemUnit}>{item.unit}</span>}
                     <div className={styles.itemPriceRow}>
-                      <span className={styles.itemPrice}>₹{item.price}</span>
+                      <span className={styles.itemPrice}>AED {Number(item.price).toFixed(2)}</span>
                       <span className={styles.itemMultiplier}>&times; {item.quantity}</span>
                     </div>
                   </div>
@@ -396,19 +396,19 @@ const Cart = () => {
                       className={`${styles.tipBtnOption} ${activeTip === 20 ? styles.tipActive : ''}`} 
                       onClick={() => handleTipClick(20)}
                     >
-                      <span className={styles.tipHeart}>♥</span> ₹20
+                      <span className={styles.tipHeart}>♥</span> AED 20.00
                     </button>
                     <button 
                       className={`${styles.tipBtnOption} ${activeTip === 30 ? styles.tipActive : ''}`} 
                       onClick={() => handleTipClick(30)}
                     >
-                      <span className={styles.tipHeart}>♥</span> ₹30
+                      <span className={styles.tipHeart}>♥</span> AED 30.00
                     </button>
                     <button 
                       className={`${styles.tipBtnOption} ${activeTip === 50 ? styles.tipActive : ''}`} 
                       onClick={() => handleTipClick(50)}
                     >
-                      <span className={styles.tipHeart}>♥</span> ₹50
+                      <span className={styles.tipHeart}>♥</span> AED 50.00
                     </button>
                     <button 
                       className={`${styles.tipBtnOption} ${activeTip === 'custom' ? styles.tipActive : ''}`} 
@@ -438,27 +438,27 @@ const Cart = () => {
                 <div className={styles.billingRows}>
                   <div className={styles.billRow}>
                     <span className={styles.rowLabel}>Subtotal</span>
-                    <span className={styles.rowVal}>₹{subtotal}</span>
+                    <span className={styles.rowVal}>AED {Number(subtotal).toFixed(2)}</span>
                   </div>
                   
                   <div className={styles.billRow}>
                     <span className={styles.rowLabel}>Delivery Partner Fee</span>
                     <span className={`${styles.rowVal} ${deliveryFee === 0 ? styles.freeText : ''}`}>
-                      {deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`}
+                      {deliveryFee === 0 ? 'FREE' : `AED ${Number(deliveryFee).toFixed(2)}`}
                     </span>
                   </div>
 
                   <div className={styles.billRow}>
                     <span className={styles.rowLabel}>Handling & Packaging Charges</span>
                     <span className={`${styles.rowVal} ${handlingCharges === 0 ? styles.freeText : ''}`}>
-                      {handlingCharges === 0 ? 'FREE' : `₹${handlingCharges}`}
+                      {handlingCharges === 0 ? 'FREE' : `AED ${Number(handlingCharges).toFixed(2)}`}
                     </span>
                   </div>
 
                   {tipAmount > 0 && (
                     <div className={styles.billRow}>
                       <span className={styles.rowLabel}>Delivery Partner Tip</span>
-                      <span className={styles.rowVal}>₹{tipAmount}</span>
+                      <span className={styles.rowVal}>AED {Number(tipAmount).toFixed(2)}</span>
                     </div>
                   )}
 
@@ -466,13 +466,13 @@ const Cart = () => {
 
                   <div className={styles.grandTotalRow}>
                     <span className={styles.totalLabel}>Grand Total</span>
-                    <span className={styles.totalVal}>₹{grandTotal}</span>
+                    <span className={styles.totalVal}>AED {Number(grandTotal).toFixed(2)}</span>
                   </div>
                 </div>
 
                 {/* Disclaimer */}
                 <p className={styles.disclaimerText}>
-                  * Prices are inclusive of all taxes. Free delivery above ₹300, and free packaging/handling above ₹500.
+                  * Prices are inclusive of all taxes. Free delivery above AED 300.00, and free packaging/handling above AED 500.00.
                 </p>
 
                 {/* Proceed Button */}
@@ -502,7 +502,7 @@ const Cart = () => {
               </span>
             </div>
             <div className={styles.mobileTotalRow}>
-              <span className={styles.mobileTotalAmount}>₹{grandTotal}</span>
+              <span className={styles.mobileTotalAmount}>AED {Number(grandTotal).toFixed(2)}</span>
               <span className={styles.mobileTotalLabel}>TOTAL AMOUNT</span>
             </div>
           </div>

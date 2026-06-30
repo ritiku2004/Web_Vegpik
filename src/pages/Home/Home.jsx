@@ -286,21 +286,20 @@ const Home = () => {
       <div className={styles.mainContent}>
         
         {/* ─── HERO CAROUSEL BANNER (EXACT GREEN DESIGN) ─── */}
-        {displayTopBanners.length > 0 && activeBanner && (
-          <section className={styles.bannerSection}>
-            <div 
-              className={styles.promoBanner}
-              style={{ 
-                background: activeBanner.backgroundColor || 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)',
-                color: activeBanner.textColor || 'inherit'
-              }}
-            >
-              {/* Left Nav Arrow */}
-              <button className={styles.navArrow} aria-label="Previous Slide" onClick={handlePrevSlide}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                  <polyline points="15 18 9 12 15 6" />
-                </svg>
-              </button>
+        <section className={styles.bannerSection}>
+          <div 
+            className={styles.promoBanner}
+            style={{ 
+              background: activeBanner.backgroundColor || 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)',
+              color: '#166534'
+            }}
+          >
+            {/* Left Nav Arrow */}
+            <button className={styles.navArrow} aria-label="Previous Slide" onClick={handlePrevSlide}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
 
               <div className={styles.bannerLeft}>
                 {activeBanner.subtitle && <span className={styles.promoBadge}>{activeBanner.subtitle}</span>}
@@ -343,9 +342,7 @@ const Home = () => {
               </div>
             )}
           </section>
-        )}
-
-        {/* ─── TRENDING PRODUCTS ROW ─── */}
+                  {/* ─── TRENDING PRODUCTS ROW ─── */}
         {trendingProducts.length > 0 && (
           <section className={styles.section}>
             <div className={styles.sectionHeader}>
@@ -437,7 +434,7 @@ const Home = () => {
                   className={styles.promoBanner}
                   style={{ 
                     background: midBanner.backgroundColor || 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)',
-                    color: midBanner.textColor || 'inherit'
+                    color: '#166534'
                   }}
                 >
                   {/* Left Nav Arrow */}

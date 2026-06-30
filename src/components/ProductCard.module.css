@@ -1,0 +1,282 @@
+.card {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e8ecf1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px -4px rgba(0, 0, 0, 0.08);
+  border-color: #cbd5e1;
+}
+
+.outOfStockCard {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.imageContainer {
+  height: 160px;
+  background: #ffffff;
+  position: relative;
+  width: 100%;
+  overflow: visible;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  padding: 0;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.card:hover .image {
+  transform: scale(1.06);
+}
+
+.outOfStockOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(1px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 5;
+}
+
+.outOfStockText {
+  color: white;
+  background: #ef4444;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+.vegIcon {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid #16a34a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white;
+  border-radius: 3px;
+}
+
+.vegDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #16a34a;
+}
+
+.addButtonWrapper {
+  position: absolute;
+  bottom: -14px;
+  right: 10px;
+  z-index: 10;
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.addButton {
+  background: #f0fdf4;
+  border: 1.5px solid #16a34a;
+  color: #16a34a;
+  border-radius: 8px;
+  height: 30px;
+  width: 72px;
+  font-weight: 800;
+  font-size: 11.5px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.addButton:hover {
+  background: #dcfce7;
+  transform: scale(1.03);
+}
+
+.controlContainer {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: white;
+  border-radius: 8px;
+  height: 30px;
+  width: 72px;
+  justify-content: space-between;
+  padding: 0 3px;
+}
+
+.actionButton {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.actionButton:hover {
+  opacity: 0.8;
+}
+
+.actionButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.quantityText {
+  color: white;
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+  min-width: 14px;
+}
+
+.infoContainer {
+  padding: 14px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.unitTag {
+  background: #f1f5f9;
+  align-self: flex-start;
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+
+.unitText {
+  font-size: 10px;
+  font-weight: 700;
+  color: #475569;
+}
+
+.name {
+  font-size: 13px;
+  font-weight: 720;
+  color: #1e293b;
+  line-height: 1.35;
+  height: 35px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  margin-bottom: 6px;
+}
+
+.deliveryRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.clockIcon {
+  color: #16a34a;
+}
+
+.deliveryText {
+  font-size: 10px;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.discountBadge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #2563eb;
+  background: #eff6ff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  z-index: 4;
+}
+
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.price {
+  font-size: 15px;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.originalPrice {
+  font-size: 11px;
+  text-decoration: line-through;
+  color: #94a3b8;
+}
+
+/* --- Responsive --------------------------------------- */
+@media (max-width: 480px) {
+  .card {
+    border-radius: 12px;
+    height: 100%;
+  }
+
+  .imageContainer {
+    height: 110px;
+  }
+
+  .image {
+    padding: 0;
+  }
+
+  .infoContainer {
+    padding: 10px 10px 10px;
+  }
+
+  .name {
+    font-size: 12px;
+    height: 32px;
+  }
+
+  .price {
+    font-size: 14px;
+  }
+
+  .addButton, .controlContainer {
+    height: 28px;
+    width: 66px;
+  }
+}

@@ -37,10 +37,12 @@ const ProductCard = React.memo(({
           </div>
         )}
 
-        {/* Veg Icon (Bottom Left) */}
-        <div className={styles.vegIcon}>
-          <div className={styles.vegDot} />
-        </div>
+        {/* Discount badge */}
+        {hasDiscount && (
+          <div className={styles.discountBadge}>
+            {discountPercent}% OFF
+          </div>
+        )}
 
         {/* Overlapping ADD Button (Bottom Right) */}
         {!isOutOfStock && (
@@ -73,18 +75,13 @@ const ProductCard = React.memo(({
         </h4>
 
 
-        {/* Discount badge */}
-        {hasDiscount && (
-          <div className={styles.discountText}>
-            {discountPercent}% OFF
-          </div>
-        )}
+
 
         {/* Price Row */}
         <div className={styles.priceRow}>
-          <span className={styles.price}>₹{discountPrice || price}</span>
+          <span className={styles.price}>AED {Number(discountPrice || price).toFixed(2)}</span>
           {hasDiscount && (
-            <span className={styles.originalPrice}>₹{price}</span>
+            <span className={styles.originalPrice}>AED {Number(price).toFixed(2)}</span>
           )}
         </div>
       </div>
