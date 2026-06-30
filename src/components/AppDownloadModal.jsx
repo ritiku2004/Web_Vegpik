@@ -74,14 +74,15 @@ export default function AppDownloadModal() {
               ></path>
             </svg>
             
-            {/* Logo Badge Overlap */}
-            <div className={styles.logoContainer}>
-              <img 
-                src="/logo.png" 
-                alt="Vegpik Logo" 
-                className={styles.logo}
-              />
-            </div>
+          </div>
+          
+          {/* Logo Badge Overlap */}
+          <div className={styles.logoContainer}>
+            <img 
+              src="/logo.png" 
+              alt="Vegpik Logo" 
+              className={styles.logo}
+            />
           </div>
 
           {/* Text and Actions Content */}
