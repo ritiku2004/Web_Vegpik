@@ -102,7 +102,6 @@ export default function LoginPage() {
           <div className={styles.logoWrapper}>
             <SafeImage src="/logo.png" alt="Logo" className={styles.logoImage} />
           </div>
-          <h2 className={styles.brandTitle}>Vegpik</h2>
           <p className={styles.brandSubtitle}>Fresh groceries delivered to you</p>
         </div>
 
@@ -174,9 +173,9 @@ export default function LoginPage() {
         {/* Privacy Terms Note */}
         <p className={styles.footerText}>
           By continuing, you agree to our{' '}
-          <span className={styles.accentLink}>Terms of Service</span>
+          <span className={styles.accentLink} onClick={() => navigate('/terms')}>Terms of Service</span>
           {' '}&{' '}
-          <span className={styles.accentLink}>Privacy Policy</span>.
+          <span className={styles.accentLink} onClick={() => navigate('/privacy')}>Privacy Policy</span>.
         </p>
       </div>
     </div>

@@ -19,6 +19,8 @@ function CategoriesContent() {
   const catParam = searchParams.get('cat');
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+  const [sortBy, setSortBy] = useState('default');
+  const [showSortDrawer, setShowSortDrawer] = useState(false);
 
   useEffect(() => {
     setSelectedCategoryId(catParam);
@@ -56,6 +58,31 @@ function CategoriesContent() {
   });
 
   const categoryProducts = productsData?.products || [];
+
+  const sortedProducts = React.useMemo(() => {
+    let prods = [...categoryProducts];
+    if (sortBy === 'price_low_high') {
+      prods.sort((a, b) => parseFloat(a.discountPrice || a.price || 0) - parseFloat(b.discountPrice || b.price || 0));
+    } else if (sortBy === 'price_high_low') {
+      prods.sort((a, b) => parseFloat(b.discountPrice || b.price || 0) - parseFloat(a.discountPrice || a.price || 0));
+    } else if (sortBy === 'discount') {
+      prods.sort((a, b) => {
+        const discA = a.discountPrice ? (parseFloat(a.price) - parseFloat(a.discountPrice)) : 0;
+        const discB = b.discountPrice ? (parseFloat(b.price) - parseFloat(b.discountPrice)) : 0;
+        return discB - discA;
+      });
+    }
+    return prods;
+  }, [categoryProducts, sortBy]);
+
+  const getSortLabel = (type) => {
+    switch (type) {
+      case 'price_low_high': return 'Low to High';
+      case 'price_high_low': return 'High to Low';
+      case 'discount': return 'Discounted';
+      default: return 'Default';
+    }
+  };
 
   if (loading) {
     return <Loader />;
@@ -201,15 +228,96 @@ function CategoriesContent() {
             </aside>
 
             <div className={styles.categoryProductsGrid}>
-              <h3 className={styles.categoryTabTitle}>
-                {categories.find((c) => c.id === selectedCategoryId)?.name || 'Products'}
-              </h3>
+              <div className={styles.categoryGridHeader}>
+                <h3 className={styles.categoryTabTitle} style={{ margin: 0 }}>
+                  {categories.find((c) => c.id === selectedCategoryId)?.name || 'Products'}
+                </h3>
+                <div className={styles.sortDropdownWrapper}>
+                  <button 
+                    className={styles.sortFilterBtn} 
+                    onClick={() => setShowSortDrawer(!showSortDrawer)}
+                  >
+                    <SlidersHorizontal size={16} />
+                    <span>Sort: {getSortLabel(sortBy)}</span>
+                  </button>
+                  {showSortDrawer && (
+                    <div className={styles.desktopSortDropdown}>
+                      <button 
+                        className={`${styles.dropdownItem} ${sortBy === 'default' ? styles.activeDropdownItem : ''}`}
+                        onClick={() => { setSortBy('default'); setShowSortDrawer(false); }}
+                      >
+                        Default / Popularity
+                      </button>
+                      <button 
+                        className={`${styles.dropdownItem} ${sortBy === 'price_low_high' ? styles.activeDropdownItem : ''}`}
+                        onClick={() => { setSortBy('price_low_high'); setShowSortDrawer(false); }}
+                      >
+                        Price: Low to High
+                      </button>
+                      <button 
+                        className={`${styles.dropdownItem} ${sortBy === 'price_high_low' ? styles.activeDropdownItem : ''}`}
+                        onClick={() => { setSortBy('price_high_low'); setShowSortDrawer(false); }}
+                      >
+                        Price: High to Low
+                      </button>
+                      <button 
+                        className={`${styles.dropdownItem} ${sortBy === 'discount' ? styles.activeDropdownItem : ''}`}
+                        onClick={() => { setSortBy('discount'); setShowSortDrawer(false); }}
+                      >
+                        Discounted Products
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
 
               <div className={styles.productsGrid}>
-                {categoryProducts.map((prod) => (
+                {sortedProducts.map((prod) => (
                   <ProductCard key={prod.id} product={prod} />
                 ))}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bottom Drawer for Sorting */}
+      {showSortDrawer && (
+        <div className={styles.drawerOverlay} onClick={() => setShowSortDrawer(false)}>
+          <div className={styles.drawerContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.drawerHeader}>
+              <h3 className={styles.drawerTitle}>Sort & Filter</h3>
+              <button className={styles.drawerCloseBtn} onClick={() => setShowSortDrawer(false)}>✕</button>
+            </div>
+            <div className={styles.drawerList}>
+              <button 
+                className={`${styles.drawerItem} ${sortBy === 'default' ? styles.activeDrawerItem : ''}`}
+                onClick={() => { setSortBy('default'); setShowSortDrawer(false); }}
+              >
+                <span>Default / Popularity</span>
+                {sortBy === 'default' && <span className={styles.checkIcon}>✓</span>}
+              </button>
+              <button 
+                className={`${styles.drawerItem} ${sortBy === 'price_low_high' ? styles.activeDrawerItem : ''}`}
+                onClick={() => { setSortBy('price_low_high'); setShowSortDrawer(false); }}
+              >
+                <span>Price: Low to High</span>
+                {sortBy === 'price_low_high' && <span className={styles.checkIcon}>✓</span>}
+              </button>
+              <button 
+                className={`${styles.drawerItem} ${sortBy === 'price_high_low' ? styles.activeDrawerItem : ''}`}
+                onClick={() => { setSortBy('price_high_low'); setShowSortDrawer(false); }}
+              >
+                <span>Price: High to Low</span>
+                {sortBy === 'price_high_low' && <span className={styles.checkIcon}>✓</span>}
+              </button>
+              <button 
+                className={`${styles.drawerItem} ${sortBy === 'discount' ? styles.activeDrawerItem : ''}`}
+                onClick={() => { setSortBy('discount'); setShowSortDrawer(false); }}
+              >
+                <span>Discounted Products</span>
+                {sortBy === 'discount' && <span className={styles.checkIcon}>✓</span>}
+              </button>
             </div>
           </div>
         </div>

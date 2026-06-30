@@ -28,7 +28,6 @@ export default function AboutPage() {
                 <SafeImage src="/logo.png" alt="Vegpik Logo" className={styles.logoImage} />
               </div>
             </div>
-            <h2 className={styles.heroTitle}>Vegpik</h2>
             <p className={styles.heroSubtitle}>Nourishing Lives, Freshly & Fast</p>
             <div className={styles.badgeContainer}>
               <span className={styles.badgeText}>100% ORGANIC PROMISE</span>

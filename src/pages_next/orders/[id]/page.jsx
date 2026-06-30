@@ -66,8 +66,8 @@ export default function OrderDetailPage() {
           id: id,
           orderNumber: "ORD455875",
           date: "20 Jun 2026, 9:02 pm",
-          status: "Pending Payment",
-          paymentMethod: "Google Pay UPI",
+          status: "Processing",
+          paymentMethod: "Cash on Delivery (COD)",
           address: "Selected Address",
           items: [
             { productId: "p1", name: "Aashirvaad Atta (5 kg)", quantity: 1, price: 1269, image: "https://images.unsplash.com/photo-1589924691995-400dc9ecc119?w=300", unit: "5 kg" },
@@ -102,12 +102,9 @@ export default function OrderDetailPage() {
     );
   }
 
-  // Determine if order needs payment action (including if it's our mock order or has payment pending)
-  const isPending = order.status === 'Pending Payment' || order.status === 'Processing' || order.orderNumber === 'ORD455875';
-
   // Timeline active flags
   const step1Active = true; // Awaiting confirmation is always active/green
-  const step2Active = !['Pending Payment', 'Cancelled'].includes(order.status);
+  const step2Active = !['Cancelled'].includes(order.status);
   const step3Active = ['Out for Delivery', 'On the Way', 'Delivered'].includes(order.status);
   const step4Active = order.status === 'Delivered';
 
@@ -154,40 +151,26 @@ export default function OrderDetailPage() {
           </button>
           <h1 className={styles.headerTitle}>Order Details</h1>
         </div>
-        {!isPending && (
-          <button 
-            onClick={handleDownloadInvoice}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#e8f5e9',
-              color: '#2e7d32',
-              border: '1px solid #2e7d32',
-              borderRadius: '8px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              fontSize: '14px',
-              marginLeft: 'auto'
-            }}
-          >
-            Download Invoice
-          </button>
-        )}
+        <button 
+          onClick={handleDownloadInvoice}
+          style={{
+            padding: '8px 16px',
+            backgroundColor: '#e8f5e9',
+            color: '#2e7d32',
+            border: '1px solid #2e7d32',
+            borderRadius: '8px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            fontSize: '14px',
+            marginLeft: 'auto'
+          }}
+        >
+          Download Invoice
+        </button>
       </header>
 
       {/* Main Content Wrap */}
       <div className={styles.content}>
-        {/* Action Required Box */}
-        {isPending && (
-          <div className={styles.alertBox}>
-            <div className={styles.alertHeader}>
-              <AlertTriangle size={18} />
-              <span>Action Required: Payment Pending</span>
-            </div>
-            <p className={styles.alertText}>
-              Your payment verification is pending. Please click the "Retry Payment" button at the bottom to complete your transaction, otherwise this order will be cancelled.
-            </p>
-          </div>
-        )}
 
         {/* Content Layout Columns */}
         <div className={styles.gridContainer}>
@@ -321,13 +304,6 @@ export default function OrderDetailPage() {
             </section>
           </div>
 
-        </div>
-
-        {/* Unified Action Container at the end of content flow */}
-        <div className={styles.actionContainer}>
-          <button className={styles.retryButton} onClick={() => alert('Processing payment... Thank you!')}>
-            Retry Payment ({grandTotalText})
-          </button>
         </div>
       </div>
     </div>

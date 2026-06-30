@@ -135,7 +135,6 @@ export default function Navbar({
                 value={searchQuery}
                 onClick={handleInputClick}
                 onChange={handleSearchChange}
-                onBlur={handleBlur}
               />
               {searchQuery ? (
                 <X
