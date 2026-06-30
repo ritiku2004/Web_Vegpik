@@ -103,18 +103,6 @@ const Home = () => {
   const trendingProducts = products.filter(p => p.type === 'trending');
   const bestDeals = products.filter(p => p.type === 'best deal');
 
-  const defaultBanners = [
-    {
-      id: 'default_b1',
-      title: 'Free Delivery on Orders Above 300',
-      subtitle: 'SAVE MORE ON GROCERY',
-      description: 'Shop daily essential with free delivery on orders above 300.',
-      image: bannerBagImg,
-      backgroundColor: 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)',
-      textColor: '#15803d'
-    }
-  ];
-
   // 1. Dynamic Banners Mapping (Reference from App)
   const homeTopBanners = banners.filter(
     (b) => b.location === 'home_top' || b.location === 'hometop'
@@ -123,19 +111,21 @@ const Home = () => {
     (b) => b.location === 'home_middle' || b.location === 'homemiddle'
   );
 
-  const displayTopBanners = homeTopBanners.length > 0 ? homeTopBanners : defaultBanners;
-  const displayMiddleBanners = homeMiddleBanners.length > 0 ? homeMiddleBanners : defaultBanners;
+  const displayTopBanners = homeTopBanners;
+  const displayMiddleBanners = homeMiddleBanners;
 
   const handlePrevSlide = () => {
+    if (displayTopBanners.length === 0) return;
     setCurrentSlide((prev) => (prev === 0 ? displayTopBanners.length - 1 : prev - 1));
   };
 
   const handleNextSlide = () => {
+    if (displayTopBanners.length === 0) return;
     setCurrentSlide((prev) => (prev === displayTopBanners.length - 1 ? 0 : prev + 1));
   };
 
-  const activeBanner = displayTopBanners[currentSlide] || displayTopBanners[0];
-  const midBanner = displayMiddleBanners[0] || activeBanner;
+  const activeBanner = displayTopBanners[currentSlide] || displayTopBanners[0] || null;
+  const midBanner = displayMiddleBanners[0] || null;
 
   // 2. Dynamic Categories Mapping (Reference from App)
   const categoriesWithProducts = categories
@@ -296,60 +286,64 @@ const Home = () => {
       <div className={styles.mainContent}>
         
         {/* ─── HERO CAROUSEL BANNER (EXACT GREEN DESIGN) ─── */}
-        <section className={styles.bannerSection}>
-          <div 
-            className={styles.promoBanner}
-            style={{ 
-              background: activeBanner.backgroundColor || 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)',
-              color: activeBanner.textColor || 'inherit'
-            }}
-          >
-            {/* Left Nav Arrow */}
-            <button className={styles.navArrow} aria-label="Previous Slide" onClick={handlePrevSlide}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                <polyline points="15 18 9 12 15 6" />
-              </svg>
-            </button>
+        {displayTopBanners.length > 0 && activeBanner && (
+          <section className={styles.bannerSection}>
+            <div 
+              className={styles.promoBanner}
+              style={{ 
+                background: activeBanner.backgroundColor || 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)',
+                color: activeBanner.textColor || 'inherit'
+              }}
+            >
+              {/* Left Nav Arrow */}
+              <button className={styles.navArrow} aria-label="Previous Slide" onClick={handlePrevSlide}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+              </button>
 
-            <div className={styles.bannerLeft}>
-              {activeBanner.subtitle && <span className={styles.promoBadge}>{activeBanner.subtitle}</span>}
-              <h1 className={styles.bannerHeading}>{activeBanner.title}</h1>
-              {activeBanner.description && (
-                <p className={styles.bannerDescription}>{activeBanner.description}</p>
-              )}
-              <button className={styles.bannerBtn}>Shop Now</button>
+              <div className={styles.bannerLeft}>
+                {activeBanner.subtitle && <span className={styles.promoBadge}>{activeBanner.subtitle}</span>}
+                <h1 className={styles.bannerHeading}>{activeBanner.title}</h1>
+                {activeBanner.description && (
+                  <p className={styles.bannerDescription}>{activeBanner.description}</p>
+                )}
+                <button className={styles.bannerBtn}>Shop Now</button>
+              </div>
+              
+              <div className={styles.bannerRight}>
+                <img 
+                  src={activeBanner.image || bannerBagImg} 
+                  alt={activeBanner.title} 
+                  className={styles.groceryBagImage} 
+                />
+              </div>
+
+              {/* Right Nav Arrow */}
+              <button 
+                className={`${styles.navArrow} ${styles.navArrowRight}`} 
+                aria-label="Next Slide" 
+                onClick={handleNextSlide}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </button>
             </div>
             
-            <div className={styles.bannerRight}>
-              <img 
-                src={activeBanner.image || bannerBagImg} 
-                alt={activeBanner.title} 
-                className={styles.groceryBagImage} 
-              />
-            </div>
-
-            {/* Right Nav Arrow */}
-            <button 
-              className={`${styles.navArrow} ${styles.navArrowRight}`} 
-              aria-label="Next Slide" 
-              onClick={handleNextSlide}
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
-            </button>
-          </div>
-          
-          <div className={styles.carouselIndicators}>
-            {displayTopBanners.map((_, idx) => (
-              <span 
-                key={idx} 
-                className={`${styles.dot} ${currentSlide === idx ? styles.activeDot : ''}`}
-                onClick={() => setCurrentSlide(idx)}
-              />
-            ))}
-          </div>
-        </section>
+            {displayTopBanners.length > 1 && (
+              <div className={styles.carouselIndicators}>
+                {displayTopBanners.map((_, idx) => (
+                  <span 
+                    key={idx} 
+                    className={`${styles.dot} ${currentSlide === idx ? styles.activeDot : ''}`}
+                    onClick={() => setCurrentSlide(idx)}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+        )}
 
         {/* ─── TRENDING PRODUCTS ROW ─── */}
         {trendingProducts.length > 0 && (
@@ -437,7 +431,7 @@ const Home = () => {
               </section>
 
               {/* Mid-page promotional banner: render after 2 category rows (idx === 1) */}
-              {idx === 1 && (
+              {idx === 1 && displayMiddleBanners.length > 0 && midBanner && (
               <section className={styles.bannerSection}>
                 <div 
                   className={styles.promoBanner}
