@@ -7,6 +7,7 @@ import Footer from './Footer';
 import AppDownloadModal from './AppDownloadModal';
 import SplashScreen from './SplashScreen';
 import FloatingCart from './FloatingCart';
+import BottomNav from './layout/BottomNav/BottomNav';
 import styles from '../pages_next/page.module.css';
 
 export default function ConditionalLayout({ children }) {
@@ -19,10 +20,11 @@ export default function ConditionalLayout({ children }) {
     <>
       <SplashScreen />
       {hideLayout ? (
-        <main style={{ width: '100%', minHeight: '100vh', backgroundColor: '#ffffff' }}>
+        <main style={{ width: '100%', minHeight: '100vh', backgroundColor: '#ffffff', paddingBottom: pathname === '/login' ? '0' : '80px' }}>
           <AppDownloadModal />
           <FloatingCart />
           {children}
+          {pathname !== '/login' && <BottomNav />}
         </main>
       ) : (
         <div className={`${styles.mainContainer} ${isStaticAppPage ? 'about-page-layout' : ''} ${isProductPage ? 'product-page-layout' : ''}`}>
@@ -35,9 +37,10 @@ export default function ConditionalLayout({ children }) {
               </React.Suspense>
             </div>
           )}
-          <main className={styles.contentContainer}>
+          <main className={styles.contentContainer} style={{ paddingBottom: '80px' }}>
             {children}
           </main>
+          <BottomNav />
           <div className="web-footer-wrapper">
             <Footer />
           </div>

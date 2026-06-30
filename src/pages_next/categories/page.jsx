@@ -10,6 +10,7 @@ import SafeImage from '../../components/SafeImage';
 import Loader from '../../components/Loader';
 import { AuthContext } from '../../context/AuthContext';
 import { api } from '../../services/api';
+import BrandedFooter from '../../components/BrandedFooter';
 import styles from '../page.module.css';
 
 function CategoriesContent() {
@@ -322,6 +323,7 @@ function CategoriesContent() {
           </div>
         </div>
       )}
+      <BrandedFooter />
     </div>
   );
 }

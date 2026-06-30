@@ -1,15 +1,15 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useGlobalState } from '../../../context/GlobalStateContext';
+import { CartContext } from '../../../context/CartContext';
 import { ROUTES } from '../../../utils/constants';
 import styles from './BottomNav.module.css';
 
 const BottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { cart } = useGlobalState();
+  const { cart } = useContext(CartContext);
 
-  const cartCount = cart.reduce((total, item) => total + (item.quantity || 0), 0);
+  const cartCount = (cart || []).reduce((total, item) => total + (item.quantity || 0), 0);
   const activePath = location.pathname;
 
   return (

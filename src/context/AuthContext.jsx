@@ -26,6 +26,62 @@ export const AuthContext = createContext({
   refreshAddresses: () => {},
 });
 
+function deg2rad(deg) {
+  return deg * (Math.PI / 180);
+}
+
+function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Radius of the earth in km
+  const dLat = deg2rad(lat2 - lat1);
+  const dLon = deg2rad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // Distance in km
+}
+
+async function calculateDeliveryETA(userLat, userLon, shopLat, shopLon) {
+  const uLat = parseFloat(userLat);
+  const uLon = parseFloat(userLon);
+  const sLat = parseFloat(shopLat);
+  const sLon = parseFloat(shopLon);
+
+  if (isNaN(uLat) || isNaN(uLon) || isNaN(sLat) || isNaN(sLon)) {
+    return 15;
+  }
+
+  let travelTimeMins = 0;
+
+  try {
+    const url = `https://router.project-osrm.org/route/v1/driving/${sLon},${sLat};${uLon},${uLat}?overview=false`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
+    
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    
+    const data = await response.json();
+
+    if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
+      const durationSeconds = data.routes[0].duration;
+      travelTimeMins = durationSeconds / 60;
+      travelTimeMins = travelTimeMins * 1.3; // Factor for traffic
+    } else {
+      throw new Error('OSRM returned invalid route');
+    }
+  } catch (error) {
+    console.log('Falling back to Haversine distance estimation:', error.message);
+    const distanceKm = getDistanceFromLatLonInKm(sLat, sLon, uLat, uLon);
+    const roadDistanceKm = distanceKm * 1.4;
+    travelTimeMins = roadDistanceKm * 3;
+  }
+
+  const totalEtaMins = Math.round(travelTimeMins + 10);
+  return Math.max(15, totalEtaMins);
+}
+
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
@@ -71,7 +127,8 @@ export const AuthProvider = ({ children }) => {
       if (shop) {
         setActiveShop(shop);
         setServiceAvailable(true);
-        setDeliveryETA(address.type === 'Office' ? 25 : 14);
+        const eta = await calculateDeliveryETA(address.latitude, address.longitude, shop.latitude, shop.longitude);
+        setDeliveryETA(eta);
       } else {
         setActiveShop(null);
         setServiceAvailable(false);

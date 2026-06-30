@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, AlertTriangle } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import SafeImage from '../../../components/SafeImage';
 import Loader from '../../../components/Loader';
 import { INITIAL_ORDERS, MOCK_PRODUCTS } from '../../data';
@@ -135,9 +135,9 @@ export default function OrderDetailPage() {
           iframe.contentWindow.print();
         }, 500); // Wait for fonts and images to load
       };
-    } catch (error) {
-      console.error('Error downloading invoice:', error);
-      alert('Failed to download invoice. Please try again.');
+    } catch (err) {
+      console.error(err);
+      alert('Could not download invoice');
     }
   };
 
@@ -151,22 +151,6 @@ export default function OrderDetailPage() {
           </button>
           <h1 className={styles.headerTitle}>Order Details</h1>
         </div>
-        <button 
-          onClick={handleDownloadInvoice}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#e8f5e9',
-            color: '#2e7d32',
-            border: '1px solid #2e7d32',
-            borderRadius: '8px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            fontSize: '14px',
-            marginLeft: 'auto'
-          }}
-        >
-          Download Invoice
-        </button>
       </header>
 
       {/* Main Content Wrap */}
@@ -304,6 +288,32 @@ export default function OrderDetailPage() {
             </section>
           </div>
 
+        </div>
+
+        {/* Download Invoice Button */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '24px', padding: '0 16px' }}>
+          <button 
+            onClick={handleDownloadInvoice}
+            style={{
+              width: '100%',
+              maxWidth: '420px',
+              backgroundColor: '#0f7643',
+              color: '#ffffff',
+              border: 'none',
+              padding: '16px',
+              fontSize: '16px',
+              fontWeight: '700',
+              borderRadius: '12px',
+              cursor: 'pointer',
+              boxShadow: '0 4px 6px -1px rgba(15, 118, 67, 0.2)',
+              transition: 'background-color 0.2s',
+              textAlign: 'center'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#0b5932'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#0f7643'}
+          >
+            Download Invoice
+          </button>
         </div>
       </div>
     </div>

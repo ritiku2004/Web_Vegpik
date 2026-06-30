@@ -90,8 +90,16 @@ export default function AddressesPage() {
       setEditingAddressId(existing.id);
     } else {
       clearForm();
+      if (activeAddress) {
+        setFlatNo(activeAddress.flatNo || '');
+        setAddressLine(activeAddress.addressLine || '');
+        setLandmark(activeAddress.landmark || '');
+        setCity(activeAddress.city || '');
+        setLatitude(activeAddress.latitude || null);
+        setLongitude(activeAddress.longitude || null);
+      }
     }
-  }, [addressType, addresses, availableCities]);
+  }, [addressType, addresses, availableCities, activeAddress]);
 
   // Sync addressType with activeAddress selection
   useEffect(() => {
@@ -187,11 +195,22 @@ export default function AddressesPage() {
       markerRef.current = marker;
       setMapReady(true);
 
-      // Set initial position from existing address
+      // Set initial position from existing address, or activeAddress, or fallback to center
       const existing = addresses.find(a => a.type === addressType);
       if (existing?.latitude && existing?.longitude) {
-        map.setView([existing.latitude, existing.longitude], 17);
-        marker.setLatLng([existing.latitude, existing.longitude]);
+        const extLat = Number(existing.latitude);
+        const extLng = Number(existing.longitude);
+        map.setView([extLat, extLng], 17);
+        marker.setLatLng([extLat, extLng]);
+        setLatitude(extLat);
+        setLongitude(extLng);
+      } else if (activeAddress?.latitude && activeAddress?.longitude) {
+        const actLat = Number(activeAddress.latitude);
+        const actLng = Number(activeAddress.longitude);
+        map.setView([actLat, actLng], 17);
+        marker.setLatLng([actLat, actLng]);
+        setLatitude(actLat);
+        setLongitude(actLng);
       } else {
         setLatitude(centerLat);
         setLongitude(centerLng);
@@ -206,7 +225,7 @@ export default function AddressesPage() {
         setMapReady(false);
       }
     };
-  }, [activeShop, addresses, addressType]);
+  }, [activeShop, addresses, addressType, activeAddress]);
 
   // Update map when lat/lng changes
   useEffect(() => {
@@ -250,6 +269,7 @@ export default function AddressesPage() {
   // Refined search when user enters area/colony/sector
   useEffect(() => {
     if (!addressLine.trim() || !city.trim()) return;
+    if (!isTypingRef.current) return; // Skip if change was from map drag/click or loading a saved address
 
     const timeoutId = setTimeout(async () => {
       try {
@@ -261,6 +281,9 @@ export default function AddressesPage() {
             const best = data[0];
             const lat = Number(best.lat);
             const lng = Number(best.lon);
+            
+            // Temporarily disable typing flag so the lat/lng state sync doesn't cause loop issues
+            isTypingRef.current = false;
             setLatitude(lat);
             setLongitude(lng);
             
@@ -272,6 +295,8 @@ export default function AddressesPage() {
         }
       } catch (e) {
         console.error('Area geocoding failed, staying on city:', e);
+      } finally {
+        isTypingRef.current = false;
       }
     }, 1200);
 
@@ -346,7 +371,7 @@ export default function AddressesPage() {
     );
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!receiverName.trim() || !receiverMobile.trim() || !flatNo.trim() || !addressLine.trim() || !landmark.trim() || !city.trim()) {
       alert('Please fill in all fields.');
       return;
@@ -371,12 +396,14 @@ export default function AddressesPage() {
       longitude: longitude || 77.2090,
     };
 
-    saveAddress(payload);
-
-    setTimeout(() => {
+    try {
+      await saveAddress(payload);
+    } catch (err) {
+      console.error('Error saving address:', err);
+    } finally {
       setIsSaving(false);
       navigate('/');
-    }, 300);
+    }
   };
 
   const handleDeleteAddress = (id) => {

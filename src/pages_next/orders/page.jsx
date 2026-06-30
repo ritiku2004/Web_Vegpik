@@ -11,6 +11,7 @@ import { MOCK_PRODUCTS, INITIAL_ORDERS } from '../data';
 import styles from '../page.module.css';
 import { api } from '../../services/api';
 import { API_BASE_URL } from '../../services/api';
+import BrandedFooter from '../../components/BrandedFooter';
 
 export default function OrdersPage() {
   const navigate = useNavigate();
@@ -59,6 +60,37 @@ export default function OrdersPage() {
       fetchOrders();
     }
   }, [loadingAuth]);
+
+  const handleDownloadInvoice = async (orderId) => {
+    try {
+      const token = localStorage.getItem('token') || '';
+      const response = await fetch(`${API_BASE_URL}/user/orders/${orderId}/invoice`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) throw new Error('Failed to fetch invoice');
+      const data = await response.json();
+      if (!data.success || !data.html) throw new Error('Invalid invoice data received');
+      
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+      iframe.contentDocument.open();
+      iframe.contentDocument.write(data.html);
+      iframe.contentDocument.close();
+      
+      iframe.onload = () => {
+        setTimeout(() => {
+          iframe.contentWindow.focus();
+          iframe.contentWindow.print();
+        }, 500); // Wait for fonts and images to load
+      };
+    } catch (err) {
+      console.error(err);
+      alert('Could not download invoice');
+    }
+  };
 
   const handleReorder = (order) => {
     order.items.forEach(orderItem => {
@@ -356,6 +388,30 @@ export default function OrdersPage() {
                         <span className={styles.totalValue}>AED {Number(order.total_amount || order.totalAmount).toFixed(2)}</span>
                       </div>
                     </div>
+                    {/* Download Invoice Button */}
+                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); handleDownloadInvoice(order.id); }}
+                        style={{
+                          width: '100%',
+                          backgroundColor: '#0f7643',
+                          color: '#ffffff',
+                          border: 'none',
+                          padding: '12px',
+                          fontSize: '14px',
+                          fontWeight: '700',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          boxShadow: '0 4px 6px -1px rgba(15, 118, 67, 0.2)',
+                          transition: 'background-color 0.2s',
+                          textAlign: 'center'
+                        }}
+                        onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#0b5932'}
+                        onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#0f7643'}
+                      >
+                        Download Invoice
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -363,6 +419,7 @@ export default function OrdersPage() {
           );
         })
       )}
+      <BrandedFooter />
     </div>
   );
 }
