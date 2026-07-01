@@ -22,7 +22,7 @@ export default function Navbar({
   let activeTab = 'home';
   if (pathname === '/cart') activeTab = 'cart';
   else if (pathname.startsWith('/categories')) activeTab = 'categories';
-  else if (pathname.startsWith('/orders')) activeTab = 'orders';
+  else if (pathname.startsWith('/profile')) activeTab = 'profile';
 
   const { activeAddress, deliveryETA, serviceAvailable, isAuthenticated, user } = useContext(AuthContext);
   const { cartTotalQuantity } = useContext(CartContext);
@@ -208,7 +208,7 @@ export default function Navbar({
 
                 return (
                   <button
-                    className={styles.profileCircleBtn}
+                    className={`${styles.profileCircleBtn} ${styles.desktopOnly}`}
                     onClick={() => navigate('/profile')}
                     aria-label="Profile"
                     style={{
@@ -236,7 +236,7 @@ export default function Navbar({
               })()
             ) : (
               <button
-                className={styles.loginBtn}
+                className={`${styles.loginBtn} ${styles.desktopOnly}`}
                 onClick={() => navigate('/login')}
               >
                 Login
@@ -275,7 +275,6 @@ export default function Navbar({
           className={`${styles.tabItem} ${activeTab === 'home' ? styles.activeTab : ''}`}
           onClick={() => navigate('/')}
         >
-          <div className={styles.indicatorLine} />
           <Store size={22} />
           <span>Home</span>
         </button>
@@ -284,7 +283,6 @@ export default function Navbar({
           className={`${styles.tabItem} ${activeTab === 'categories' ? styles.activeTab : ''}`}
           onClick={() => navigate('/categories')}
         >
-          <div className={styles.indicatorLine} />
           <LayoutGrid size={22} />
           <span>Categories</span>
         </button>
@@ -293,7 +291,6 @@ export default function Navbar({
           className={`${styles.tabItem} ${activeTab === 'cart' ? styles.activeTab : ''}`}
           onClick={() => navigate('/cart')}
         >
-          <div className={styles.indicatorLine} />
           <div className={styles.cartIconWrapper}>
             <ShoppingCart size={22} className={cartTotalQuantity > 0 ? styles.pulseCart : ''} />
             {cartTotalQuantity > 0 && (
@@ -304,12 +301,11 @@ export default function Navbar({
         </button>
 
         <button
-          className={`${styles.tabItem} ${activeTab === 'orders' ? styles.activeTab : ''}`}
-          onClick={() => navigate(isAuthenticated ? '/orders' : '/login')}
+          className={`${styles.tabItem} ${activeTab === 'profile' ? styles.activeTab : ''}`}
+          onClick={() => navigate(isAuthenticated ? '/profile' : '/login')}
         >
-          <div className={styles.indicatorLine} />
-          <RotateCcw size={20} />
-          <span>Order Again</span>
+          <User size={20} />
+          <span>Profile</span>
         </button>
       </div>
 

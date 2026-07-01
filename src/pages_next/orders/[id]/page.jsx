@@ -16,72 +16,110 @@ export default function OrderDetailPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('pastOrders');
-      let orders = INITIAL_ORDERS;
-      if (saved) {
-        try {
-          orders = JSON.parse(saved);
-        } catch (e) {
-          console.error(e);
+    const fetchOrderDetails = async () => {
+      setLoading(true);
+      try {
+        const token = localStorage.getItem('token');
+        let found = null;
+        
+        if (token) {
+          const { api } = await import('../../../services/api');
+          const res = await api.getUserOrders(token);
+          if (res && res.data) {
+            found = res.data.find(o => String(o.id) === String(id) || String(o.order_number) === String(id));
+          }
         }
-      }
-
-      const found = orders.find(o => String(o.id) === String(id) || String(o.orderNumber) === String(id));
-      if (found) {
-        // Build items data with fallbacks for image/units if missing
-        const mappedItems = found.items.map(item => {
-          const match = MOCK_PRODUCTS.find(p => p.id === item.productId);
-          return {
-            ...item,
-            image: match ? match.image : 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=150',
-            unit: match ? match.unit : '1 unit'
-          };
-        });
-
-        // Compute summaries
-        const itemTotal = found.totalAmount;
-        const handlingCharge = found.handlingCharge || 5;
-        const deliveryPartnerFee = 0;
-        const grandTotal = itemTotal + handlingCharge;
-
-        setOrder({
-          id: found.id,
-          orderNumber: found.orderNumber,
-          date: found.date,
-          status: found.status || 'Delivered',
-          paymentMethod: found.paymentMethod || 'Google Pay UPI',
-          address: found.address || 'Selected Address',
-          items: mappedItems,
-          billSummary: {
-            itemTotal,
-            handlingCharge,
-            deliveryPartnerFee,
-            grandTotal
+        
+        // Fallback to local storage / mock if not found via API
+        if (!found) {
+          const saved = localStorage.getItem('pastOrders');
+          let orders = INITIAL_ORDERS;
+          if (saved) {
+            try { orders = JSON.parse(saved); } catch (e) {}
           }
-        });
-      } else {
-        // Exact screenshot mock fallback for demo/invalid IDs
-        setOrder({
-          id: id,
-          orderNumber: "ORD455875",
-          date: "20 Jun 2026, 9:02 pm",
-          status: "Processing",
-          paymentMethod: "Cash on Delivery (COD)",
-          address: "Selected Address",
-          items: [
-            { productId: "p1", name: "Aashirvaad Atta (5 kg)", quantity: 1, price: 1269, image: "https://images.unsplash.com/photo-1589924691995-400dc9ecc119?w=300", unit: "5 kg" },
-            { productId: "p2", name: "Aashirvaad Atta (1 kg)", quantity: 1, price: 1296, image: "https://images.unsplash.com/photo-1589924691995-400dc9ecc119?w=300", unit: "1 kg" }
-          ],
-          billSummary: {
-            itemTotal: 2565,
-            handlingCharge: 5,
-            deliveryPartnerFee: 0,
-            grandTotal: 2693.25
+          found = orders.find(o => String(o.id) === String(id) || String(o.orderNumber) === String(id));
+        }
+
+        if (found) {
+          const mappedItems = (found.items || []).map(item => {
+            const match = MOCK_PRODUCTS.find(p => p.id === (item.productId || item.product_id));
+            const image = item.image_url || item.image || (match ? match.image : 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=150');
+            // Make sure image uses full URL if it's media.vegpik.com
+            let finalImage = image;
+            const baseUrl = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000/api/v1').replace('/api/v1', '');
+            if (finalImage && finalImage.includes('media.vegpik.com')) {
+              finalImage = `${baseUrl}/uploads${finalImage.split('media.vegpik.com')[1]}`;
+            } else if (finalImage && !finalImage.startsWith('http')) {
+              finalImage = `${baseUrl}/${finalImage}`;
+            }
+
+            return {
+              ...item,
+              productId: item.productId || item.product_id,
+              name: item.name || item.product_name,
+              price: item.price,
+              image: finalImage,
+              unit: match ? match.unit : '1 unit'
+            };
+          });
+
+          const itemTotal = Number(found.totalAmount || found.total_amount) || 0;
+          const handlingCharge = Number(found.handlingCharge || found.handling_fee) || 0;
+          const deliveryPartnerFee = Number(found.delivery_fee) || 0;
+          const grandTotal = itemTotal; // API total_amount is already grand total
+
+          // Format full address
+          let fullAddress = found.address || 'Selected Address';
+          if (found.address_line1) {
+            fullAddress = `${found.receiver_name ? found.receiver_name + ' - ' : ''}${found.address_line1}${found.address_line2 ? ', ' + found.address_line2 : ''}, ${found.city || ''}`;
+            if (found.receiver_mobile) fullAddress += ` (Phone: ${found.receiver_mobile})`;
           }
-        });
+
+          setOrder({
+            id: found.id,
+            orderNumber: found.orderNumber || found.order_number,
+            date: found.date || (found.created_at ? new Date(found.created_at).toLocaleString() : ''),
+            status: found.status || 'Delivered',
+            paymentMethod: found.paymentMethod || found.payment_method || 'Google Pay UPI',
+            address: fullAddress,
+            items: mappedItems,
+            billSummary: {
+              itemTotal: grandTotal - handlingCharge - deliveryPartnerFee,
+              handlingCharge,
+              deliveryPartnerFee,
+              grandTotal
+            }
+          });
+        } else {
+          // Exact screenshot mock fallback for demo/invalid IDs
+          setOrder({
+            id: id,
+            orderNumber: "ORD455875",
+            date: "20 Jun 2026, 9:02 pm",
+            status: "Processing",
+            paymentMethod: "Cash on Delivery (COD)",
+            address: "Selected Address",
+            items: [
+              { productId: "p1", name: "Aashirvaad Atta (5 kg)", quantity: 1, price: 1269, image: "https://images.unsplash.com/photo-1589924691995-400dc9ecc119?w=300", unit: "5 kg" },
+              { productId: "p2", name: "Aashirvaad Atta (1 kg)", quantity: 1, price: 1296, image: "https://images.unsplash.com/photo-1589924691995-400dc9ecc119?w=300", unit: "1 kg" }
+            ],
+            billSummary: {
+              itemTotal: 2565,
+              handlingCharge: 5,
+              deliveryPartnerFee: 0,
+              grandTotal: 2693.25
+            }
+          });
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
+    };
+    
+    if (typeof window !== 'undefined') {
+      fetchOrderDetails();
     }
   }, [id]);
 

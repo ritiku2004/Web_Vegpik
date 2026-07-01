@@ -194,6 +194,54 @@
   color: #16a34a;
 }
 
+/* ── Form Inputs ── */
+.inputField {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: white;
+}
+
+.inputField:focus {
+  border-color: #0f7643;
+  box-shadow: 0 0 0 3px rgba(15, 118, 67, 0.1);
+}
+
+.inputLabel {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 6px;
+}
+
+.fileInput {
+  display: block;
+  width: 100%;
+  font-size: 14px;
+  color: #475569;
+}
+
+.fileInput::file-selector-button {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #1e293b;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 12px;
+  transition: background 0.2s ease;
+}
+
+.fileInput::file-selector-button:hover {
+  background: #e2e8f0;
+}
+
 /* ── Order Items ── */
 .itemsList {
   display: flex;

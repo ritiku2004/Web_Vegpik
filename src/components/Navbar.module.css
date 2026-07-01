@@ -399,21 +399,9 @@
   padding-bottom: 2px;
 }
 
-.indicatorLine {
-  position: absolute;
-  top: 0;
-  left: 20%;
-  right: 20%;
-  height: 3px;
-  background: transparent;
-}
-
 .activeTab {
   color: #22c55e !important;
-}
-
-.activeTab .indicatorLine {
-  background: #22c55e;
+  border-top: 3px solid #22c55e;
 }
 
 /* Responsive Rules */

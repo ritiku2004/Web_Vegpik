@@ -220,7 +220,7 @@ export default function ProfilePage() {
     return <Loader />;
   }
 
-  const displayName = user?.name || (user?.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : '') || 'Guest User';
+  const displayName = user?.name || (user?.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : '') || 'User';
 
   const userInitials = displayName
     ? displayName

@@ -63,9 +63,7 @@ const OrderAgain = () => {
     if (isEmoji) {
       return <span className={styles.avatarEmoji}>{url}</span>;
     }
-    const baseUrl = import.meta.env.VITE_API_BASE_URL 
-      ? import.meta.env.VITE_API_BASE_URL.replace('/api/v1', '') 
-      : 'http://localhost:3000';
+    const baseUrl = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000/api/v1').replace('/api/v1', '');
     
     let fullUrl = url;
     if (url.includes('media.vegpik.com')) {
@@ -227,9 +225,7 @@ const OrderAgain = () => {
                   {/* Item Thumbnails Grid */}
                   <div className={styles.itemsRow}>
                     {ord.items?.slice(0, 4).map((item, idx) => {
-                      const baseUrl = import.meta.env.VITE_API_BASE_URL 
-                        ? import.meta.env.VITE_API_BASE_URL.replace('/api/v1', '') 
-                        : 'http://localhost:3000';
+                      const baseUrl = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000/api/v1').replace('/api/v1', '');
                       
                       let imgSource = item.image_url;
                       if (imgSource && imgSource.includes('media.vegpik.com')) {

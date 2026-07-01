@@ -25,22 +25,26 @@ export default function ContactPage() {
     }
   }, [isAuthenticated, loading, navigate, location]);
 
-  const handleEmail = () => {
-    window.location.href = 'mailto:support@Vegpik.com';
-  };
 
-  const handleCall = () => {
-    window.location.href = 'tel:+9118004190099';
-  };
 
-  const handleWhatsApp = () => {
-    window.open('https://wa.me/9118004190099?text=Hello%20Vegpik%20Support', '_blank');
-  };
+  const [contactCards, setContactCards] = useState([]);
+  const [loadingContact, setLoadingContact] = useState(true);
 
-  const handleMap = () => {
-    const address = '123 Grocery Lane, Fresh Valley, Silicon Valley, CA 94000';
-    window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`, '_blank');
-  };
+  useEffect(() => {
+    let isMounted = true;
+    const fetchContactInfo = async () => {
+      try {
+        const data = await api.getContactInfo();
+        if (isMounted) setContactCards(data);
+      } catch (err) {
+        console.error('Failed to load contact info', err);
+      } finally {
+        if (isMounted) setLoadingContact(false);
+      }
+    };
+    fetchContactInfo();
+    return () => { isMounted = false; };
+  }, []);
 
   const subjects = [
     'Order & Delivery Issues',
@@ -119,77 +123,73 @@ export default function ContactPage() {
 
         {/* Contact Methods List */}
         <div className={styles.cardsContainer}>
-          {/* WhatsApp Card */}
-          <div
-            className={`${styles.contactCard} ${styles.highlightedCard}`}
-            onClick={handleWhatsApp}
-          >
-            <div className={styles.iconContainer} style={{ backgroundColor: '#E8FBEB' }}>
-              <MessageSquare size={22} color="#0f7643" />
-            </div>
-            <div className={styles.contactDetails}>
-              <div className={styles.cardHeaderRow}>
-                <span className={styles.contactTitle}>Live WhatsApp Chat</span>
-                <div className={styles.badge}>
-                  <span className={styles.badgeText}>INSTANT</span>
+          {contactCards.filter(c => c.field_key !== 'OPERATING_HOURS' && c.value).map((card, index) => {
+            let IconComponent, bgColor, iconColor;
+            switch(card.field_key) {
+              case 'WHATSAPP':
+                IconComponent = MessageSquare; bgColor = '#E8FBEB'; iconColor = '#0f7643'; break;
+              case 'PHONE':
+                IconComponent = Phone; bgColor = '#FFFBEB'; iconColor = '#D97706'; break;
+              case 'EMAIL':
+                IconComponent = Mail; bgColor = '#EFF6FF'; iconColor = '#2563EB'; break;
+              case 'OFFICE':
+                IconComponent = MapPin; bgColor = '#F1F5F9'; iconColor = '#64748B'; break;
+              default:
+                IconComponent = MessageSquare; bgColor = '#F1F5F9'; iconColor = '#64748B'; break;
+            }
+
+            const handlePress = () => {
+              if (card.action_label && (card.action_label.startsWith('http') || card.action_label.startsWith('tel:') || card.action_label.startsWith('mailto:'))) {
+                window.open(card.action_label, '_blank');
+              } else if (card.value) {
+                if (card.field_key === 'PHONE') window.location.href = `tel:${card.value.split('/')[0].replace(/[^0-9+]/g, '')}`;
+                else if (card.field_key === 'EMAIL') window.location.href = `mailto:${card.value}`;
+              }
+            };
+
+            return (
+              <div
+                key={card.id || index}
+                className={`${styles.contactCard} ${card.field_key === 'WHATSAPP' ? styles.highlightedCard : ''}`}
+                onClick={handlePress}
+              >
+                <div className={styles.iconContainer} style={{ backgroundColor: bgColor }}>
+                  <IconComponent size={22} color={iconColor} />
                 </div>
+                <div className={styles.contactDetails}>
+                  <div className={styles.cardHeaderRow}>
+                    <span className={styles.contactTitle}>{card.title}</span>
+                    {card.field_key === 'WHATSAPP' && (
+                      <div className={styles.badge}>
+                        <span className={styles.badgeText}>INSTANT</span>
+                      </div>
+                    )}
+                  </div>
+                  <p className={styles.contactSubtitle}>{card.description}</p>
+                  {card.field_key === 'WHATSAPP' && card.action_label ? (
+                    <span className={styles.actionText}>{card.action_label === card.value ? 'Start conversation' : card.action_label}</span>
+                  ) : (
+                    <p className={styles.contactValue}>{card.value}</p>
+                  )}
+                </div>
+                <ChevronRight size={18} color="#64748b" />
               </div>
-              <p className={styles.contactSubtitle}>Best for returns, refunds & order issues</p>
-              <span className={styles.actionText}>Start conversation</span>
-            </div>
-            <ChevronRight size={18} color="#64748b" />
-          </div>
-
-          {/* Call Card */}
-          <div className={styles.contactCard} onClick={handleCall}>
-            <div className={styles.iconContainer} style={{ backgroundColor: '#FFFBEB' }}>
-              <Phone size={22} color="#D97706" />
-            </div>
-            <div className={styles.contactDetails}>
-              <span className={styles.contactTitle}>Call Customer Care</span>
-              <p className={styles.contactSubtitle}>Speak directly with our support team</p>
-              <p className={styles.contactValue}>+91 1800-419-0099</p>
-            </div>
-            <ChevronRight size={18} color="#64748b" />
-          </div>
-
-          {/* Email Card */}
-          <div className={styles.contactCard} onClick={handleEmail}>
-            <div className={styles.iconContainer} style={{ backgroundColor: '#EFF6FF' }}>
-              <Mail size={22} color="#2563EB" />
-            </div>
-            <div className={styles.contactDetails}>
-              <span className={styles.contactTitle}>Email Support</span>
-              <p className={styles.contactSubtitle}>For bulk orders & corporate feedback</p>
-              <p className={styles.contactValue}>support@Vegpik.com</p>
-            </div>
-            <ChevronRight size={18} color="#64748b" />
-          </div>
-
-          {/* Head Office Card */}
-          <div className={styles.contactCard} onClick={handleMap}>
-            <div className={styles.iconContainer} style={{ backgroundColor: '#F1F5F9' }}>
-              <MapPin size={22} color="#64748b" />
-            </div>
-            <div className={styles.contactDetails}>
-              <span className={styles.contactTitle}>Corporate Office</span>
-              <p className={styles.contactSubtitle}>Silicon Valley, CA 94000</p>
-              <p className={styles.contactValue}>123 Grocery Lane, Fresh Valley</p>
-            </div>
-            <ChevronRight size={18} color="#64748b" />
-          </div>
+            );
+          })}
         </div>
 
         {/* Operating Hours Banner */}
-        <div className={styles.hoursBanner}>
-          <Clock size={20} className={styles.hoursIcon} />
-          <div className={styles.hoursContent}>
-            <h3 className={styles.hoursTitle}>Operating Hours</h3>
-            <p className={styles.hoursText}>
-              Phone lines are active daily from <span className={styles.boldText}>6:00 AM to 11:00 PM</span>. Inquiries sent via Email or WhatsApp outside these hours will be handled first thing in the morning.
-            </p>
+        {contactCards.filter(c => c.field_key === 'OPERATING_HOURS' && (c.value || c.description)).map((card, index) => (
+          <div key={card.id || index} className={styles.hoursBanner}>
+            <Clock size={20} className={styles.hoursIcon} />
+            <div className={styles.hoursContent}>
+              <h3 className={styles.hoursTitle}>{card.title}</h3>
+              <p className={styles.hoursText}>
+                {card.description}
+              </p>
+            </div>
           </div>
-        </div>
+        ))}
 
         {/* Support Query Form */}
         <form className={styles.formContainer} onSubmit={handleSubmit}>

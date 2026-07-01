@@ -33,6 +33,31 @@ function CheckoutContent() {
   const [latestOrderNo, setLatestOrderNo] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Payment Options
+  const [paymentMethod, setPaymentMethod] = useState('COD');
+  const [paymentSettings, setPaymentSettings] = useState(null);
+  
+  // PayPal inputs
+  const [transactionId, setTransactionId] = useState('');
+  const [paymentScreenshot, setPaymentScreenshot] = useState(null);
+
+  // Bank Transfer inputs
+  const [userBankName, setUserBankName] = useState('');
+  const [userBankAccount, setUserBankAccount] = useState('');
+  const [userBankIban, setUserBankIban] = useState('');
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const result = await api.getPaymentSettings();
+        setPaymentSettings(result);
+      } catch (err) {
+        console.error('Failed to fetch payment settings', err);
+      }
+    };
+    fetchSettings();
+  }, []);
+
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -49,23 +74,47 @@ function CheckoutContent() {
     setIsProcessing(true);
 
     try {
-      const orderPayload = {
-        shopId: activeShop?.id || 1,
-        addressId: activeAddress?.id,
-        totalAmount: finalTotal,
-        items: cartItems.map(item => ({
-          productId: item.productId,
-          quantity: item.quantity,
-        })),
-        tipAmount: driverTip,
-        discountAmount: cartSavings,
-        handlingFee: handlingFee,
-        deliveryFee: deliveryFee,
-        paymentMethod: 'COD',
-      };
+      if (paymentMethod === 'PayPal' && (!transactionId || !paymentScreenshot)) {
+        alert('Please provide transaction ID and upload a screenshot of your payment.');
+        setIsProcessing(false);
+        return;
+      }
+      
+      if (paymentMethod === 'Bank Transfer' && (!userBankName || !userBankAccount || !userBankIban)) {
+        alert('Please fill in all your bank details to proceed.');
+        setIsProcessing(false);
+        return;
+      }
 
-      const result = await api.createOrder(orderPayload, token);
-      const orderData = result.data;
+      const orderPayload = new FormData();
+      orderPayload.append('shopId', activeShop?.id || 1);
+      orderPayload.append('addressId', activeAddress?.id);
+      orderPayload.append('totalAmount', finalTotal);
+      orderPayload.append('items', JSON.stringify(cartItems.map(item => ({
+        productId: item.productId,
+        quantity: item.quantity,
+      }))));
+      orderPayload.append('tipAmount', driverTip);
+      orderPayload.append('discountAmount', cartSavings);
+      orderPayload.append('handlingFee', handlingFee);
+      orderPayload.append('deliveryFee', deliveryFee);
+      orderPayload.append('paymentMethod', paymentMethod);
+
+      if (paymentMethod === 'PayPal') {
+        orderPayload.append('transactionId', transactionId);
+        orderPayload.append('payment_screenshot', paymentScreenshot);
+      }
+
+      if (paymentMethod === 'Bank Transfer') {
+        orderPayload.append('userBankName', userBankName);
+        orderPayload.append('userBankAccount', userBankAccount);
+        orderPayload.append('userBankIban', userBankIban);
+      }
+
+      // Since we send FormData, we need a custom api method or adjust api.createOrder.
+      // Assuming api.createOrder uses axios and handles FormData if passed as payload.
+      const result = await api.createOrder(orderPayload, token, true);
+      const orderData = result.data || result;
 
       const newOrder = {
         id: orderData.orderId,
@@ -159,6 +208,93 @@ function CheckoutContent() {
           </div>
 
 
+
+          {/* Payment Method Card */}
+          <div className={styles.card}>
+            <div className={styles.cardHeaderRow}>
+              <div className={styles.cardTitleGroup}>
+                <CreditCard size={20} className={styles.accentGreen} />
+                <h3 className={styles.cardTitle}>Payment Method</h3>
+              </div>
+            </div>
+            <div className={styles.paymentOptions}>
+              {(!paymentSettings || paymentSettings.is_cod_active !== 0 && paymentSettings.is_cod_active !== false) && (
+                <label className={`${styles.paymentOption} ${paymentMethod === 'COD' ? styles.paymentOptionActive : ''}`}>
+                  <input type="radio" name="payment" value="COD" checked={paymentMethod === 'COD'} onChange={() => setPaymentMethod('COD')} className={styles.radioInput} />
+                  <div className={styles.optionDetails}>
+                    <span className={styles.optionTitle}>Cash on Delivery (COD)</span>
+                  </div>
+                </label>
+              )}
+              
+              {(!paymentSettings || paymentSettings.is_paypal_active !== 0 && paymentSettings.is_paypal_active !== false) && (
+                <>
+                  <label className={`${styles.paymentOption} ${paymentMethod === 'PayPal' ? styles.paymentOptionActive : ''}`}>
+                    <input type="radio" name="payment" value="PayPal" checked={paymentMethod === 'PayPal'} onChange={() => setPaymentMethod('PayPal')} className={styles.radioInput} />
+                    <div className={styles.optionDetails}>
+                      <span className={styles.optionTitle}>PayPal</span>
+                    </div>
+                  </label>
+                  
+                  {paymentMethod === 'PayPal' && paymentSettings && (
+                    <div style={{ marginLeft: '24px', marginBottom: '16px', padding: '20px', backgroundColor: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                      <p style={{ marginBottom: '16px', fontSize: '14px', color: '#334155' }}>
+                        Please send the payment to our PayPal ID: <strong style={{ color: 'var(--accent-primary)', fontSize: '15px' }}>{paymentSettings.paypal_id}</strong>
+                      </p>
+                      
+                      <div style={{ marginBottom: '16px' }}>
+                        <label className={styles.inputLabel}>Transaction ID <span style={{ color: '#ef4444' }}>*</span></label>
+                        <input type="text" value={transactionId} onChange={(e) => setTransactionId(e.target.value)} required placeholder="Enter Transaction ID" className={styles.inputField} />
+                      </div>
+                      
+                      <div>
+                        <label className={styles.inputLabel}>Payment Screenshot <span style={{ color: '#ef4444' }}>*</span></label>
+                        <input type="file" accept="image/*" onChange={(e) => setPaymentScreenshot(e.target.files[0])} required className={styles.fileInput} />
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {(!paymentSettings || paymentSettings.is_bank_transfer_active !== 0 && paymentSettings.is_bank_transfer_active !== false) && (
+                <>
+                  <label className={`${styles.paymentOption} ${paymentMethod === 'Bank Transfer' ? styles.paymentOptionActive : ''}`}>
+                    <input type="radio" name="payment" value="Bank Transfer" checked={paymentMethod === 'Bank Transfer'} onChange={() => setPaymentMethod('Bank Transfer')} className={styles.radioInput} />
+                    <div className={styles.optionDetails}>
+                      <span className={styles.optionTitle}>Bank Transfer</span>
+                    </div>
+                  </label>
+
+                  {paymentMethod === 'Bank Transfer' && paymentSettings && (
+                    <div style={{ marginLeft: '24px', marginBottom: '16px', padding: '20px', backgroundColor: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                      <div style={{ marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid #cbd5e1' }}>
+                        <p style={{ fontWeight: '700', marginBottom: '12px', color: '#1e293b', fontSize: '15px' }}>Transfer to our Bank Account:</p>
+                        <div style={{ display: 'grid', gap: '8px', fontSize: '14px', color: '#475569' }}>
+                          <p>Bank Name: <strong style={{ color: '#1e293b' }}>{paymentSettings.bank_name}</strong></p>
+                          <p>Account Number: <strong style={{ color: '#1e293b' }}>{paymentSettings.bank_account}</strong></p>
+                          <p>IBAN: <strong style={{ color: '#1e293b' }}>{paymentSettings.bank_iban}</strong></p>
+                        </div>
+                      </div>
+                      
+                      <p style={{ fontWeight: '700', marginBottom: '16px', color: '#1e293b', fontSize: '15px' }}>Enter your bank details to verify:</p>
+                      <div style={{ marginBottom: '16px' }}>
+                        <label className={styles.inputLabel}>Your Bank Name <span style={{ color: '#ef4444' }}>*</span></label>
+                        <input type="text" value={userBankName} onChange={(e) => setUserBankName(e.target.value)} required placeholder="e.g. Citi Bank" className={styles.inputField} />
+                      </div>
+                      <div style={{ marginBottom: '16px' }}>
+                        <label className={styles.inputLabel}>Your Account Number <span style={{ color: '#ef4444' }}>*</span></label>
+                        <input type="text" value={userBankAccount} onChange={(e) => setUserBankAccount(e.target.value)} required placeholder="e.g. 123456789" className={styles.inputField} />
+                      </div>
+                      <div>
+                        <label className={styles.inputLabel}>Your IBAN <span style={{ color: '#ef4444' }}>*</span></label>
+                        <input type="text" value={userBankIban} onChange={(e) => setUserBankIban(e.target.value)} required placeholder="e.g. AE00..." className={styles.inputField} />
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
 
           {/* Items Summary Card */}
           <div className={styles.card}>

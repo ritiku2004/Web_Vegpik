@@ -346,7 +346,7 @@ export default function OrdersPage() {
                         <span className={styles.detailLabel}>Recipient Address</span>
                         <span className={styles.detailValue}>
                           {order.address_line1 
-                            ? `${order.address_line1}${order.address_line2 ? `, ${order.address_line2}` : ''}, ${order.city || ''}, Zip: ${order.zipcode || order.zip_code || ''}`
+                            ? `${order.receiver_name ? order.receiver_name + ' - ' : ''}${order.address_line1}${order.address_line2 ? `, ${order.address_line2}` : ''}, ${order.city || ''} (Phone: ${order.receiver_mobile || ''})`
                             : activeAddress 
                               ? `${activeAddress.flatNo}, ${activeAddress.addressLine}, Zip: ${activeAddress.zipcode}`
                               : 'No Address Specified'}

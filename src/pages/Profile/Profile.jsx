@@ -79,12 +79,10 @@ const Profile = () => {
     if (url.includes('media.vegpik.com')) {
       const parts = url.split('media.vegpik.com');
       const pathAfterDomain = parts[parts.length - 1]; // e.g. "/users/avatar-..." or "/products/..."
-      const baseUrl = import.meta.env.VITE_API_BASE_URL 
-        ? import.meta.env.VITE_API_BASE_URL.replace('/api/v1', '') 
-        : 'http://localhost:3000';
+      const baseUrl = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000/api/v1').replace('/api/v1', '');
       fullUrl = `${baseUrl}/uploads${pathAfterDomain}`;
     } else {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL.replace('/api/v1', '') : 'http://localhost:3000';
+      const baseUrl = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000/api/v1').replace('/api/v1', '');
       fullUrl = url.startsWith('http') ? url : `${baseUrl}/${url}`;
     }
     return (

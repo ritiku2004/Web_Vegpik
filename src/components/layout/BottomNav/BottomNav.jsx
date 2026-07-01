@@ -54,13 +54,14 @@ const BottomNav = () => {
       </button>
 
       <button 
-        className={`${styles.navItem} ${activePath === '/order-again' ? styles.navItemActive : ''}`} 
-        onClick={() => navigate('/order-again')}
+        className={`${styles.navItem} ${activePath === '/profile' ? styles.navItemActive : ''}`} 
+        onClick={() => navigate('/profile')}
       >
         <svg className={styles.navIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
         </svg>
-        <span className={styles.navLabel}>Order Again</span>
+        <span className={styles.navLabel}>Profile</span>
       </button>
     </nav>
   );

@@ -421,15 +421,19 @@ export const api = {
   },
 
   // Create order on the Backend
-  createOrder: async (orderData, token) => {
+  createOrder: async (orderData, token, isFormData = false) => {
     try {
+      const headers = {
+        'Authorization': `Bearer ${token}`
+      };
+      if (!isFormData) {
+        headers['Content-Type'] = 'application/json';
+      }
+
       const response = await fetch(`${API_BASE_URL}/user/orders`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(orderData)
+        headers,
+        body: isFormData ? orderData : JSON.stringify(orderData)
       });
       if (!response.ok) {
         const error = await response.json().catch(() => ({}));
@@ -485,6 +489,20 @@ export const api = {
     }
   },
 
+  // Get Payment Settings
+  getPaymentSettings: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/payment-settings`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch payment settings');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error in getPaymentSettings API:', error);
+      throw error;
+    }
+  },
+
   // Fetch all shops from backend
   getShops: async () => {
     try {
@@ -500,6 +518,20 @@ export const api = {
       return [];
     }
   },
+
+  // Fetch dynamic contact info
+  getContactInfo: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/support/contact-info`);
+      if (!response.ok) throw new Error('Failed to fetch contact info');
+      const data = await response.json();
+      return data.data || [];
+    } catch (error) {
+      console.error('Error fetching contact info:', error);
+      return [];
+    }
+  },
+
 
   // Fetch user notifications from backend
   fetchNotifications: async () => {

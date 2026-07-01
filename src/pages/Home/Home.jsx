@@ -232,8 +232,8 @@ const Home = () => {
                     ) : (
                       <img 
                         src={user.profile_picture_url.includes('media.vegpik.com') 
-                          ? `${import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL.replace('/api/v1', '') : 'http://localhost:3000'}/uploads${user.profile_picture_url.split('media.vegpik.com')[1]}` 
-                          : (user.profile_picture_url.startsWith('http') ? user.profile_picture_url : `${import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL.replace('/api/v1', '') : 'http://localhost:3000'}/${user.profile_picture_url}`)}
+                          ? `${(import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000/api/v1').replace('/api/v1', '')}/uploads${user.profile_picture_url.split('media.vegpik.com')[1]}` 
+                          : (user.profile_picture_url.startsWith('http') ? user.profile_picture_url : `${(import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000/api/v1').replace('/api/v1', '')}/${user.profile_picture_url}`)}
                         alt="Profile" 
                         className={styles.avatarImg} 
                         onError={() => setAvatarError(true)}
