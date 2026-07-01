@@ -396,6 +396,30 @@ export const api = {
     }
   },
 
+  getSocialLinks: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/support/social-links`);
+      if (!response.ok) throw new Error('Failed to fetch social links');
+      const data = await response.json();
+      return data.data || [];
+    } catch (error) {
+      console.error('Error in getSocialLinks API:', error);
+      return [];
+    }
+  },
+
+  getContactInfo: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/support/contact-info`);
+      if (!response.ok) throw new Error('Failed to fetch contact info');
+      const data = await response.json();
+      return data.data || [];
+    } catch (error) {
+      console.error('Error in getContactInfo API:', error);
+      return [];
+    }
+  },
+
   // Create order on the Backend
   createOrder: async (orderData, token) => {
     try {

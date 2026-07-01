@@ -79,10 +79,10 @@ export default function ContactPage() {
       setLoadingSubmit(true);
 
       const email = user?.email || '';
-      const name = user?.name || '';
+      const name = user?.name || `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || '';
       const phone = user?.phone_number || '';
 
-      await api.submitSupportQuery(subject, description, token, email, name, phone);
+      await api.submitSupportQuery(subject, description, email, name, phone);
 
       alert('Your query has been submitted successfully! We will get back to you soon.');
       setDescription('');
