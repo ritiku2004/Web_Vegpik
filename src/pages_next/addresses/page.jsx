@@ -235,8 +235,10 @@ export default function AddressesPage() {
     }
   }, [latitude, longitude, mapReady]);
 
-  // Search location on typing, matching the mobile app behavior
   // Automatically point map to the city when user changes city
+  // Commented out to prevent overwriting existing address coordinates on mount.
+  // The map already centers on the activeShop's coordinates if no address exists.
+  /*
   useEffect(() => {
     if (!city) return;
     
@@ -265,6 +267,7 @@ export default function AddressesPage() {
 
     return () => clearTimeout(timeoutId);
   }, [city]);
+  */
 
   // Refined search when user enters area/colony/sector
   useEffect(() => {
