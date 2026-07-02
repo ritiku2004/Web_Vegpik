@@ -93,7 +93,7 @@ const Terms = () => {
               <h3 className={styles.cardTitle}>4. Orders, Pricing & Delivery</h3>
             </div>
             <p className={styles.cardBody}>
-              All product prices are subject to change without notice. Delivery timelines are estimates, and while we strive to meet them, Vegpik is not liable for minor delays outside our control (e.g. extreme weather or transit conditions).
+              All product prices are subject to change without notice. The delivery time shown in the app is an estimate and is not guaranteed. Actual delivery times may vary due to factors outside of our control, including but not limited to weather conditions, traffic, high order volumes, or unforeseen delays. We strive to deliver as quickly as possible but cannot be held liable for any delays.
             </p>
           </div>
 

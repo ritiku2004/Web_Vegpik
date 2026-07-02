@@ -5,6 +5,35 @@ export const getApiBaseUrl = () => {
 export const API_BASE_URL = getApiBaseUrl();  
 
 let authToken = null;
+let onTokenInvalidCallback = null;
+
+export const registerTokenInvalidCallback = (callback) => {
+  onTokenInvalidCallback = callback;
+};
+
+export const checkResponseForTokenError = async (response) => {
+  if (response.status === 401) {
+    if (onTokenInvalidCallback) {
+      onTokenInvalidCallback();
+    }
+  } else {
+    try {
+      const clone = response.clone();
+      const body = await clone.json().catch(() => null);
+      if (body && body.message && (
+        body.message.toLowerCase().includes('invalid token') ||
+        body.message.toLowerCase().includes('jwt expired') ||
+        body.message.toLowerCase().includes('token expired')
+      )) {
+        if (onTokenInvalidCallback) {
+          onTokenInvalidCallback();
+        }
+      }
+    } catch (e) {
+      // Ignore reading clone parse failures
+    }
+  }
+};
 
 const getHeaders = () => {
   const headers = { 'Content-Type': 'application/json' };
@@ -245,6 +274,7 @@ export const api = {
         headers: getHeaders(),
       });
       if (!response.ok) {
+        await checkResponseForTokenError(response);
         const errData = await response.json().catch(() => ({}));
         throw new Error(errData.message || 'Failed to fetch profile');
       }
@@ -265,6 +295,7 @@ export const api = {
         body: JSON.stringify({ name, email, phone_number: phoneNumber, profile_picture_url: profilePictureUrl }),
       });
       if (!response.ok) {
+        await checkResponseForTokenError(response);
         const errData = await response.json().catch(() => ({}));
         throw new Error(errData.message || 'Failed to update profile');
       }
@@ -282,12 +313,10 @@ export const api = {
       const response = await fetch(`${API_BASE_URL}/user/auth/addresses`, {
         headers: getHeaders(),
       });
-      if (response.status === 401) {
-        const err = new Error('Session expired');
-        err.isAuthError = true;
-        throw err;
+      if (!response.ok) {
+        await checkResponseForTokenError(response);
+        throw new Error('Failed to fetch addresses');
       }
-      if (!response.ok) throw new Error('Failed to fetch addresses');
       const data = await response.json();
       return data.data || [];
     } catch (error) {
@@ -304,7 +333,10 @@ export const api = {
         headers: getHeaders(),
         body: JSON.stringify(addressData),
       });
-      if (!response.ok) throw new Error('Failed to save address');
+      if (!response.ok) {
+        await checkResponseForTokenError(response);
+        throw new Error('Failed to save address');
+      }
       const data = await response.json();
       return data.data; // contains id
     } catch (error) {
@@ -320,7 +352,10 @@ export const api = {
         method: 'DELETE',
         headers: getHeaders(),
       });
-      if (!response.ok) throw new Error('Failed to delete address');
+      if (!response.ok) {
+        await checkResponseForTokenError(response);
+        throw new Error('Failed to delete address');
+      }
       const data = await response.json();
       return data;
     } catch (error) {
@@ -338,6 +373,7 @@ export const api = {
         body: JSON.stringify({ guestId, userId }),
       });
       if (!response.ok) {
+        await checkResponseForTokenError(response);
         const errData = await response.json().catch(() => ({}));
         throw new Error(errData.message || 'Failed to merge carts');
       }
@@ -366,6 +402,7 @@ export const api = {
       });
 
       if (!response.ok) {
+        await checkResponseForTokenError(response);
         const errData = await response.json().catch(() => ({}));
         throw new Error(errData.message || 'Upload failed');
       }
@@ -386,6 +423,7 @@ export const api = {
         body: JSON.stringify({ subject, description, email, name, phone }),
       });
       if (!response.ok) {
+        await checkResponseForTokenError(response);
         const errData = await response.json().catch(() => ({}));
         throw new Error(errData.message || 'Failed to submit support query');
       }
@@ -436,6 +474,7 @@ export const api = {
         body: isFormData ? orderData : JSON.stringify(orderData)
       });
       if (!response.ok) {
+        await checkResponseForTokenError(response);
         const error = await response.json().catch(() => ({}));
         throw new Error(error.message || 'Failed to create order');
       }
@@ -457,6 +496,7 @@ export const api = {
         }
       });
       if (!response.ok) {
+        await checkResponseForTokenError(response);
         const error = await response.json().catch(() => ({}));
         throw new Error(error.message || 'Failed to fetch orders');
       }
@@ -479,6 +519,7 @@ export const api = {
         body: JSON.stringify(paymentData)
       });
       if (!response.ok) {
+        await checkResponseForTokenError(response);
         const error = await response.json().catch(() => ({}));
         throw new Error(error.message || 'Failed to verify payment');
       }
@@ -539,7 +580,10 @@ export const api = {
       const response = await fetch(`${API_BASE_URL}/user/notifications`, {
         headers: getHeaders(),
       });
-      if (!response.ok) throw new Error('Failed to fetch notifications');
+      if (!response.ok) {
+        await checkResponseForTokenError(response);
+        throw new Error('Failed to fetch notifications');
+      }
       const data = await response.json();
       return data.data || [];
     } catch (error) {
@@ -555,7 +599,10 @@ export const api = {
         method: 'PUT',
         headers: getHeaders(),
       });
-      if (!response.ok) throw new Error('Failed to mark notification as read');
+      if (!response.ok) {
+        await checkResponseForTokenError(response);
+        throw new Error('Failed to mark notification as read');
+      }
       return await response.json();
     } catch (error) {
       console.error('Error marking notification as read:', error);
@@ -570,7 +617,10 @@ export const api = {
         method: 'PUT',
         headers: getHeaders(),
       });
-      if (!response.ok) throw new Error('Failed to mark all notifications as read');
+      if (!response.ok) {
+        await checkResponseForTokenError(response);
+        throw new Error('Failed to mark all notifications as read');
+      }
       return await response.json();
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
@@ -585,7 +635,10 @@ export const api = {
         method: 'DELETE',
         headers: getHeaders(),
       });
-      if (!response.ok) throw new Error('Failed to clear notifications');
+      if (!response.ok) {
+        await checkResponseForTokenError(response);
+        throw new Error('Failed to clear notifications');
+      }
       return await response.json();
     } catch (error) {
       console.error('Error clearing notifications:', error);

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useState, useEffect } from 'react';
-import { api } from '../services/api';
+import { api, registerTokenInvalidCallback } from '../services/api';
 
 const DEFAULT_ADDRESSES = [];
 
@@ -387,6 +387,17 @@ export const AuthProvider = ({ children }) => {
       updateLocationAndShop(DEFAULT_ADDRESSES[0]);
     }
   };
+
+  // Register invalid token interceptor callback to clear local storage and force login
+  useEffect(() => {
+    registerTokenInvalidCallback(() => {
+      console.warn('[AuthContext] Triggering global logout due to invalid token error.');
+      logout();
+    });
+    return () => {
+      registerTokenInvalidCallback(null);
+    };
+  }, []);
 
   const setActiveAddressById = (id) => {
     const target = addresses.find((addr) => addr.id === id);
